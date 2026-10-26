@@ -83,6 +83,7 @@ export function StopList({ day, timeline, onEditStop }: StopListProps) {
               <SortableStop
                 key={item.stop.id}
                 item={item}
+                dayNumber={day.number}
                 number={i + 1}
                 isFirst={i === 0}
                 isLast={i === timeline.stops.length - 1}
@@ -143,6 +144,7 @@ function Spacer() {
 
 type SortableStopProps = {
   item: TimelineStop;
+  dayNumber: number;
   number: number;
   isFirst: boolean;
   isLast: boolean;

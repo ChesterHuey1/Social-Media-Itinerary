@@ -122,3 +122,19 @@ def test_edit_on_unknown_trip_is_404(client: TestClient) -> None:
         "/api/trips/nope/edits", json={"type": "moveStop", "dayNumber": 2, "fromIndex": 0, "toIndex": 1}
     )
     assert response.status_code == 404
+
+
+def test_move_to_day_puts_the_stop_last_on_the_other_day_and_unlocks_it(client: TestClient) -> None:
+    moved = next(s for s in day(client, 2)["stops"] if s["id"] == "d2s2")
+    assert moved["lockedAtMin"] == 660
+    edit(client, {"type": "moveToDay", "dayNumber": 2, "stopId": "d2s2", "toDayNumber": 3})
+    assert "d2s2" not in stop_ids(client, 2)
+    assert stop_ids(client, 3)[-1] == "d2s2"
+    assert day(client, 3)["stops"][-1] == {**moved, "lockedAtMin": None}
+
+
+def test_move_to_the_same_day_changes_nothing_and_a_missing_day_is_refused(client: TestClient) -> None:
+    before = stop_ids(client)
+    edit(client, {"type": "moveToDay", "dayNumber": 2, "stopId": "d2s2", "toDayNumber": 2})
+    assert stop_ids(client) == before
+    edit(client, {"type": "moveToDay", "dayNumber": 2, "stopId": "d2s2", "toDayNumber": 9}, status=409)

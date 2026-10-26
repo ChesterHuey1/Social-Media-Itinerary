@@ -256,6 +256,15 @@ class MoveToBacklog(Schema):
     stop_id: str
 
 
+class MoveToDay(Schema):
+    """Moves a stop to the end of another day. Its locked time is cleared: it was a time on the old day."""
+
+    type: Literal["moveToDay"]
+    day_number: int
+    stop_id: str
+    to_day_number: int
+
+
 class AddFromBacklog(Schema):
     type: Literal["addFromBacklog"]
     day_number: int
@@ -284,7 +293,7 @@ class RestorePlan(Schema):
 
 
 TripEdit = Annotated[
-    MoveStop | UpdateStop | AddComment | MoveToBacklog | AddFromBacklog | ReplaceDayStops | RestorePlan,
+    MoveStop | UpdateStop | AddComment | MoveToBacklog | MoveToDay | AddFromBacklog | ReplaceDayStops | RestorePlan,
     Field(discriminator="type"),
 ]
 

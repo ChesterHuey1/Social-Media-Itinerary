@@ -489,6 +489,33 @@
   font-weight: 600;
 }
 
+/* ---------- Move to another day ---------- */
+.moveMenu {
+  padding: var(--s8) var(--s16);
+  border-radius: var(--radius-control);
+  background: var(--surface-alt);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.moveRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s16);
+  box-shadow: inset 0 -1px 0 var(--line-soft);
+}
+.moveText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.moveWarn {
+  font-size: 14px;
+  color: var(--warn-text);
+}
+
 /* ---------- Day breakdown ---------- */
 .breakdown {
   padding: var(--s24);

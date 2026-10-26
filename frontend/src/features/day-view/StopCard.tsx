@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, Ref } from 'react';
+import { useState, type ButtonHTMLAttributes, type Ref } from 'react';
 import { formatRange, formatUsd } from '../../domain/format';
 import { hoursText } from '../../domain/hours';
 import { stopProblemText, type TimelineStop } from '../../domain/timeline';
@@ -8,10 +8,12 @@ import { BookAheadChip, ObjectiveChip, StayChip } from '../../ui/Chip';
 import { cx } from '../../ui/cx';
 import { Icon, type IconName } from '../../ui/Icon';
 import s from './DayView.module.css';
+import { MoveToDayMenu } from './MoveToDayMenu';
 import { stopColorValue } from './stopColors';
 
 type StopCardProps = {
   item: TimelineStop;
+  dayNumber: number;
   number: number;
   isFirst: boolean;
   isLast: boolean;
@@ -55,7 +57,8 @@ function IconAction({ icon, label, onClick, on, accent, disabled }: IconActionPr
 }
 
 export function StopCard(props: StopCardProps) {
-  const { item, number, isFirst, isLast, dragHandle, onEdit, onMoveUp, onMoveDown, onMoveLater, onToggleLock, onMoveToBacklog } = props;
+  const { item, dayNumber, number, isFirst, isLast, dragHandle, onEdit, onMoveUp, onMoveDown, onMoveLater, onToggleLock, onMoveToBacklog } = props;
+  const [moving, setMoving] = useState(false);
   const { stop, place, arriveMin, leaveMin, problem } = item;
   const name = stop.title ?? place.name;
   const locked = stop.lockedAtMin !== null;
@@ -83,11 +86,13 @@ export function StopCard(props: StopCardProps) {
           <IconAction icon="chevronDown" label="Move down" onClick={onMoveDown} disabled={isLast} />
           <IconAction icon="pencil" label="Edit stop" onClick={onEdit} />
           <IconAction icon={locked ? 'lock' : 'unlock'} label={locked ? 'Unlock time' : 'Lock time'} on={locked} onClick={onToggleLock} />
+          <IconAction icon="arrowRight" label="Move to another day" on={moving} onClick={() => setMoving((v) => !v)} />
           <IconAction icon="backlog" label="Move to backlog" accent onClick={onMoveToBacklog} />
         </span>
       </div>
 
       <div className={s.stopBody}>
+        {moving && <MoveToDayMenu dayNumber={dayNumber} stopId={stop.id} onClose={() => setMoving(false)} />}
         {problem && (
           <div className={s.alert} role="alert">
             <span>{stopProblemText(problem, arriveMin)}</span>

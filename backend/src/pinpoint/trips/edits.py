@@ -102,6 +102,18 @@ def apply_edit(session: Session, trip_id: str, edit: schemas.TripEdit) -> None:
                 )
             )
 
+        case schemas.MoveToDay(day_number=n, stop_id=stop_id, to_day_number=to):
+            if to == n:
+                return
+            day, target = _day(session, trip_id, n), _day(session, trip_id, to)
+            stop = _stop(day, stop_id)
+            # Load the target's stops first: loading them later would flush, and a stop that is off its day
+            # and on no other gets deleted as an orphan.
+            target_stops = [*target.stops, stop]
+            _renumber(day, [s for s in day.stops if s is not stop])
+            stop.locked_at_min = None
+            _renumber(target, target_stops)
+
         case schemas.ReplaceDayStops(day_number=n, stops=wanted):
             day = _day(session, trip_id, n)
             _set_day_stops(day, wanted, {s.id: s for s in day.stops})

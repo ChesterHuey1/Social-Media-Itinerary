@@ -10,6 +10,8 @@ export type TripEdit =
   | { type: 'updateStop'; dayNumber: number; stopId: string; changes: StopChanges }
   | { type: 'addComment'; dayNumber: number; stopId: string; commentId: string; body: string; createdAt: string }
   | { type: 'moveToBacklog'; dayNumber: number; stopId: string }
+  /** Moves a stop to the end of another day. Its locked time is cleared: it was a time on the old day. */
+  | { type: 'moveToDay'; dayNumber: number; stopId: string; toDayNumber: number }
   | { type: 'addFromBacklog'; dayNumber: number; stop: Stop }
   /** Puts a day back to exactly these stops. Undo after Optimize route sends the day's previous stops. */
   | { type: 'replaceDayStops'; dayNumber: number; stops: Stop[] }
@@ -66,6 +68,16 @@ export function applyTripEdit(trip: Trip, edit: TripEdit): Trip {
         ...withoutStop,
         backlog: [{ placeId: stop.placeId, reason: `Moved here from Day ${edit.dayNumber}.` }, ...trip.backlog],
       };
+    }
+
+    case 'moveToDay': {
+      const stop = trip.days.find((d) => d.number === edit.dayNumber)?.stops.find((s) => s.id === edit.stopId);
+      if (!stop || edit.toDayNumber === edit.dayNumber || !trip.days.some((d) => d.number === edit.toDayNumber)) return trip;
+      const withoutStop = updateDay(trip, edit.dayNumber, (day) => ({
+        ...day,
+        stops: day.stops.filter((s) => s.id !== edit.stopId),
+      }));
+      return updateDay(withoutStop, edit.toDayNumber, (day) => ({ ...day, stops: [...day.stops, { ...stop, lockedAtMin: null }] }));
     }
 
     case 'restorePlan': {

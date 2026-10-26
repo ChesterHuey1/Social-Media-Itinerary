@@ -81,4 +81,16 @@ describe('applyTripEdit', () => {
     const trip = base();
     expect(applyTripEdit(trip, { type: 'addFromBacklog', dayNumber: 1, stop: stopFromBacklog(trip, 1, 'a', 'x') })).toBe(trip);
   });
+
+  it('moves a stop to the end of another day and clears its locked time', () => {
+    const one = base();
+    const trip = { ...one, days: [...one.days, { ...one.days[0], number: 2, date: '2026-01-02', stops: [stop('t1', 'd', 30)] }] };
+    const locked = applyTripEdit(trip, { type: 'updateStop', dayNumber: 1, stopId: 's2', changes: { lockedAtMin: 600 } });
+    const moved = applyTripEdit(locked, { type: 'moveToDay', dayNumber: 1, stopId: 's2', toDayNumber: 2 });
+    expect(stopIds(moved)).toEqual(['s1', 's3']);
+    expect(moved.days[1].stops.map((s) => s.id)).toEqual(['t1', 's2']);
+    expect(moved.days[1].stops[1].lockedAtMin).toBeNull();
+    expect(applyTripEdit(trip, { type: 'moveToDay', dayNumber: 1, stopId: 's2', toDayNumber: 1 })).toBe(trip);
+    expect(applyTripEdit(trip, { type: 'moveToDay', dayNumber: 1, stopId: 's2', toDayNumber: 9 })).toBe(trip);
+  });
 });
