@@ -243,8 +243,21 @@ class ReplaceDayStops(Schema):
     stops: list[Stop]
 
 
+class DayStops(Schema):
+    day_number: int
+    stops: list[Stop]
+
+
+class RestorePlan(Schema):
+    """Puts every day and the backlog back exactly. Undo after Build itinerary sends the trip's plan from before."""
+
+    type: Literal["restorePlan"]
+    days: list[DayStops]
+    backlog: list[BacklogItem]
+
+
 TripEdit = Annotated[
-    MoveStop | UpdateStop | AddComment | MoveToBacklog | AddFromBacklog | ReplaceDayStops,
+    MoveStop | UpdateStop | AddComment | MoveToBacklog | AddFromBacklog | ReplaceDayStops | RestorePlan,
     Field(discriminator="type"),
 ]
 
@@ -252,6 +265,23 @@ TripEdit = Annotated[
 class DroppedStop(Schema):
     place_id: str
     reason: str
+
+
+class BuildRequest(Schema):
+    included_place_ids: list[str]
+
+
+class PlanSnapshot(Schema):
+    days: list[DayStops]
+    backlog: list[BacklogItem]
+
+
+class BuildResult(Schema):
+    trip: Trip
+    # The plan before building, for Undo.
+    previous: PlanSnapshot
+    placed: int
+    backlogged: list["DroppedStop"]
 
 
 class OptimizeResult(Schema):

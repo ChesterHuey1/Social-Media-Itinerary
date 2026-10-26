@@ -34,6 +34,25 @@ def _renumber(day: models.Day, stops: list[models.Stop]) -> None:
     day.stops = stops
 
 
+def _set_day_stops(day: models.Day, wanted: list[schemas.Stop], pool: dict[str, models.Stop]) -> None:
+    """Makes the day's stops exactly `wanted`, reusing rows from `pool` (with their comments) where they exist."""
+    stops = []
+    for position, new in enumerate(wanted):
+        stop = pool.pop(new.id, None) or models.Stop(
+            id=new.id,
+            place_id=new.place_id,
+            comments=[
+                models.Comment(id=c.id, body=c.body, created_at=date.fromisoformat(c.created_at)) for c in new.comments
+            ],
+        )
+        stop.position = position
+        stop.title, stop.color, stop.objectives = new.title, new.color, new.objectives
+        stop.stay_minutes, stop.stay_source = new.stay.minutes, new.stay.source
+        stop.locked_at_min = new.locked_at_min
+        stops.append(stop)
+    day.stops = stops
+
+
 def apply_edit(session: Session, trip_id: str, edit: schemas.TripEdit) -> None:
     match edit:
         case schemas.MoveStop(day_number=n, from_index=src, to_index=dst):
@@ -85,23 +104,7 @@ def apply_edit(session: Session, trip_id: str, edit: schemas.TripEdit) -> None:
 
         case schemas.ReplaceDayStops(day_number=n, stops=wanted):
             day = _day(session, trip_id, n)
-            current = {s.id: s for s in day.stops}
-            keep = []
-            for position, new in enumerate(wanted):
-                stop = current.pop(new.id, None) or models.Stop(
-                    id=new.id,
-                    place_id=new.place_id,
-                    comments=[
-                        models.Comment(id=c.id, body=c.body, created_at=date.fromisoformat(c.created_at))
-                        for c in new.comments
-                    ],
-                )
-                stop.position = position
-                stop.title, stop.color, stop.objectives = new.title, new.color, new.objectives
-                stop.stay_minutes, stop.stay_source = new.stay.minutes, new.stay.source
-                stop.locked_at_min = new.locked_at_min
-                keep.append(stop)
-            day.stops = keep
+            _set_day_stops(day, wanted, {s.id: s for s in day.stops})
             # Places back on the day leave the backlog.
             for item in session.scalars(
                 select(models.BacklogItem).where(
@@ -110,6 +113,23 @@ def apply_edit(session: Session, trip_id: str, edit: schemas.TripEdit) -> None:
                 )
             ):
                 session.delete(item)
+
+        case schemas.RestorePlan(days=wanted_days, backlog=wanted_backlog):
+            days = {d.number: d for d in session.scalars(select(models.Day).where(models.Day.trip_id == trip_id))}
+            # Every stop on the trip, so one that moved to another day moves back instead of being duplicated.
+            pool = {s.id: s for d in days.values() for s in d.stops}
+            for wanted in wanted_days:
+                if wanted.day_number not in days:
+                    raise EditRejected(f"Day {wanted.day_number} is not on trip {trip_id}")
+                _set_day_stops(days[wanted.day_number], wanted.stops, pool)
+            session.flush()
+            for item in session.scalars(select(models.BacklogItem).where(models.BacklogItem.trip_id == trip_id)):
+                session.delete(item)
+            session.flush()
+            for position, item in enumerate(wanted_backlog):
+                session.add(
+                    models.BacklogItem(trip_id=trip_id, place_id=item.place_id, reason=item.reason, position=position)
+                )
 
         case schemas.AddFromBacklog(day_number=n, stop=new):
             day = _day(session, trip_id, n)

@@ -1,14 +1,14 @@
 """Runs Optimize route for one stored day: builds the solver's inputs, applies its order, and moves dropped
 stops to the backlog with a reason. Returns the day's previous stops so the browser can offer Undo."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import UTC, datetime
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from pinpoint import models, schemas
-from pinpoint.plan.optimize import StopInput, Window, optimize_day
+from pinpoint.plan.optimize import StopInput, Window, assign_meals, optimize_day
 from pinpoint.plan.travel import Node, Travel, estimate
 from pinpoint.trips.read import stop_schema
 
@@ -86,11 +86,14 @@ def optimize_trip_day(session: Session, trip_id: str, day_number: int) -> Optimi
         return known[key]
 
     windows = {s.id: _windows(places[s.place_id]) for s in stops}
+    inputs = [
+        StopInput(s.id, s.stay_minutes, windows[s.id], places[s.place_id].last_entry_min, s.locked_at_min)
+        for s in stops
+    ]
+    eat_stops = [i for i, s in zip(inputs, stops, strict=True) if "eat" in s.objectives and s.locked_at_min is None]
+    meals = assign_meals(eat_stops, day.start_min, day.end_min)
     plan = optimize_day(
-        [
-            StopInput(s.id, s.stay_minutes, windows[s.id], places[s.place_id].last_entry_min, s.locked_at_min)
-            for s in stops
-        ],
+        [replace(i, meal=meals.get(i.id)) for i in inputs],
         lambda i, j: travel(i, j).minutes,
         day.start_min,
         day.end_min,

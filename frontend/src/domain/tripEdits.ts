@@ -1,5 +1,5 @@
 import { defaultStayMinutes } from './timeline';
-import type { Day, Stop, StopColor, Trip } from './types';
+import type { BacklogItem, Day, Stop, StopColor, Trip } from './types';
 
 export type StopChanges = Partial<Pick<Stop, 'title' | 'color' | 'objectives' | 'stay' | 'lockedAtMin'>>;
 
@@ -12,7 +12,9 @@ export type TripEdit =
   | { type: 'moveToBacklog'; dayNumber: number; stopId: string }
   | { type: 'addFromBacklog'; dayNumber: number; stop: Stop }
   /** Puts a day back to exactly these stops. Undo after Optimize route sends the day's previous stops. */
-  | { type: 'replaceDayStops'; dayNumber: number; stops: Stop[] };
+  | { type: 'replaceDayStops'; dayNumber: number; stops: Stop[] }
+  /** Puts every day and the backlog back exactly. Undo after Build itinerary sends the plan from before. */
+  | { type: 'restorePlan'; days: { dayNumber: number; stops: Stop[] }[]; backlog: BacklogItem[] };
 
 
 function updateDay(trip: Trip, dayNumber: number, change: (day: Day) => Day): Trip {
@@ -66,6 +68,15 @@ export function applyTripEdit(trip: Trip, edit: TripEdit): Trip {
       };
     }
 
+    case 'restorePlan': {
+      const byDay = new Map(edit.days.map((d) => [d.dayNumber, d.stops]));
+      return {
+        ...trip,
+        days: trip.days.map((d) => (byDay.has(d.number) ? { ...d, stops: byDay.get(d.number) ?? [] } : d)),
+        backlog: edit.backlog,
+      };
+    }
+
     case 'replaceDayStops': {
       const placeIds = new Set(edit.stops.map((s) => s.placeId));
       const withStops = updateDay(trip, edit.dayNumber, (day) => ({ ...day, stops: edit.stops }));
@@ -81,7 +92,8 @@ export function applyTripEdit(trip: Trip, edit: TripEdit): Trip {
   }
 }
 
-const STOP_COLOR_CYCLE: StopColor[] = ['green', 'blue', 'amber', 'ink'];
+/** Same as backend/src/pinpoint/plan/defaults.py; both test suites check it. */
+export const STOP_COLOR_CYCLE: StopColor[] = ['green', 'blue', 'amber', 'ink'];
 
 /** The stop a backlog place becomes when added to the end of a day. Both the browser and the server
  * insert exactly this stop, so the defaults live in one place. */

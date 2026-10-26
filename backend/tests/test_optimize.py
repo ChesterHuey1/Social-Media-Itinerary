@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi.testclient import TestClient
 
-from pinpoint.plan.optimize import StopInput, Window, optimize_day
+from pinpoint.plan.optimize import MEALS, StopInput, Window, assign_meals, optimize_day
 from pinpoint.plan.travel import Node, estimate
 
 DAY_START, DAY_END = 8 * 60, 21 * 60
@@ -82,6 +82,35 @@ def test_never_plans_a_visit_across_the_lunch_break() -> None:
     assert plan.dropped == []
     # Either the restaurant at lunch before the museum, or at dinner after it; never in the 14:30-17:30 gap.
     assert plan.order in (["restaurant", "museum"], ["museum", "restaurant"])
+
+
+def test_dinner_goes_to_the_place_open_latest_and_lunch_to_the_next() -> None:
+    noon_to_late = [Window(11 * 60, 23 * 60)]
+    market = [Window(5 * 60, 14 * 60)]
+    meals = assign_meals(
+        [stop("market", windows=market), stop("ramen"), stop("sushi", windows=noon_to_late)], 8 * 60, 21 * 60
+    )
+    _, lunch, dinner = MEALS
+    assert meals["ramen"] == (dinner[1], dinner[2])  # open all day, so it stays open latest
+    assert meals["sushi"] == (lunch[1], lunch[2])
+    assert meals["market"] == (8 * 60, 10 * 60)  # breakfast, starting when the day does
+
+
+def test_eat_stops_land_near_lunch_and_dinner() -> None:
+    _, lunch, dinner = MEALS
+    stops = [
+        stop("museum", stay=180),
+        stop("lunch", stay=60),
+        stop("walk", stay=180),
+        stop("park", stay=120),
+        stop("dinner", stay=60),
+    ]
+    meals = {"lunch": (lunch[1], lunch[2]), "dinner": (dinner[1], dinner[2])}
+    stops = [StopInput(s.id, s.stay_min, s.windows, 0, None, meals.get(s.id)) for s in stops]
+    plan = optimize_day(stops, line_travel([0, 1, 1, 1, 1, 1]), DAY_START, DAY_END)
+    assert plan.dropped == []
+    assert lunch[1] <= plan.arrivals["lunch"] <= lunch[2]
+    assert dinner[1] <= plan.arrivals["dinner"] <= dinner[2]
 
 
 def test_estimate_matches_the_frontend() -> None:

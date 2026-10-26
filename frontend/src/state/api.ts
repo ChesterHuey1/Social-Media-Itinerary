@@ -1,5 +1,15 @@
 import type { TripEdit } from '../domain/tripEdits';
-import type { Stop, Trip } from '../domain/types';
+import type { BacklogItem, Stop, Trip } from '../domain/types';
+
+export type PlanSnapshot = { days: { dayNumber: number; stops: Stop[] }[]; backlog: BacklogItem[] };
+
+export type BuildResult = {
+  trip: Trip;
+  /** The plan before building, for Undo. */
+  previous: PlanSnapshot;
+  placed: number;
+  backlogged: { placeId: string; reason: string }[];
+};
 
 export type OptimizeResult = {
   trip: Trip;
@@ -29,4 +39,9 @@ export function saveEdit(id: string, edit: TripEdit): Promise<Trip> {
 /** Reorders a day on the server (OR-Tools). Dropped stops go to the backlog with a reason. */
 export function optimizeDay(id: string, dayNumber: number): Promise<OptimizeResult> {
   return request<OptimizeResult>(`/api/trips/${id}/days/${dayNumber}/optimize`, { method: 'POST' });
+}
+
+/** Puts the chosen saved places onto days by city and area, then plans each day. */
+export function buildItinerary(id: string, includedPlaceIds: string[]): Promise<BuildResult> {
+  return request<BuildResult>('/api/trips/' + id + '/build', { method: 'POST', body: JSON.stringify({ includedPlaceIds }) });
 }

@@ -8,14 +8,15 @@ OR-Tools routing with a time dimension:
 4. Waiting before a stop is capped at 20 minutes. Before the first stop you just leave the hotel later.
 5. A locked stop's arrival is exactly its locked time.
 6. Every stop has a drop penalty, so one that can't fit is dropped instead of the whole solve failing.
-7. The objective is the least total travel time, which also removes backtracking. A smaller cost on
+7. Eat stops are pulled toward a meal time (soft; see assign_meals).
+8. The objective is the least total travel time, which also removes backtracking. A smaller cost on
    when the day ends breaks ties toward using the morning instead of leaving the hotel late.
 
 This module is pure: it takes plain values and returns an order, so it is tested without a database.
 """
 
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 
@@ -24,7 +25,13 @@ LEG_SLACK_MIN = 10
 MAX_WAIT_MIN = 20
 DROP_PENALTY = 100_000
 LOCKED_DROP_PENALTY = 10_000_000
-SOLVE_SECONDS = 2
+# The search keeps improving until its time is up; small days need far less than big ones.
+SOLVE_MS_PER_STOP = 200
+MAX_SOLVE_MS = 2000
+# Spec defaults: breakfast 7-10 AM, lunch 11:30 AM-2 PM, dinner 6-9 PM. A preference, not a rule:
+# each minute an Eat stop arrives outside its meal costs this much, against 1 per minute of travel.
+MEALS = (("breakfast", 7 * 60, 10 * 60), ("lunch", 11 * 60 + 30, 14 * 60), ("dinner", 18 * 60, 21 * 60))
+MEAL_PENALTY_PER_MIN = 3
 
 
 @dataclass(frozen=True)
@@ -41,12 +48,37 @@ class StopInput:
     windows: list[Window] | None
     last_entry_min: int
     locked_at_min: int | None
+    # Preferred arrival range for an Eat stop, from assign_meals. Soft: the plan may miss it.
+    meal: tuple[int, int] | None = None
 
 
 @dataclass(frozen=True)
 class DayPlan:
     order: list[str]
     dropped: list[str]
+    # Planned arrival per kept stop, in minutes from midnight.
+    arrivals: dict[str, int] = field(default_factory=dict)
+
+
+def _open_during(stop: StopInput, start: int, end: int) -> bool:
+    return stop.windows is None or any(w.open_min < end and w.close_min > start for w in stop.windows)
+
+
+def _latest_close(stop: StopInput) -> int:
+    return 2 * 24 * 60 if stop.windows is None else max((w.close_min for w in stop.windows), default=0)
+
+
+def assign_meals(eat_stops: list[StopInput], day_start: int, day_end: int) -> dict[str, tuple[int, int]]:
+    """Gives each meal of the day to one Eat stop that is open then. Dinner is filled first, with the place
+    that stays open latest; then lunch; then breakfast. Extra Eat stops get no meal."""
+    meals = [(start, end) for _, start, end in MEALS if start < day_end and end > day_start]
+    assigned: dict[str, tuple[int, int]] = {}
+    for start, end in reversed(meals):
+        open_then = [s for s in eat_stops if s.id not in assigned and _open_during(s, start, end)]
+        if open_then:
+            pick = max(open_then, key=_latest_close)
+            assigned[pick.id] = (max(start, day_start), min(end, day_end))
+    return assigned
 
 
 def _arrival_ranges(stop: StopInput, day_start: int, day_end: int) -> list[tuple[int, int]]:
@@ -110,6 +142,9 @@ def optimize_day(
             continue
         cumul = time.CumulVar(index)
         cumul.SetRange(ranges[0][0], ranges[-1][1])
+        if stop.meal and stop.locked_at_min is None:
+            time.SetCumulVarSoftLowerBound(index, stop.meal[0], MEAL_PENALTY_PER_MIN)
+            time.SetCumulVarSoftUpperBound(index, stop.meal[1], MEAL_PENALTY_PER_MIN)
         for (_, gap_start), (gap_end, _) in zip(ranges, ranges[1:], strict=False):
             if gap_start + 1 <= gap_end - 1:
                 cumul.RemoveInterval(gap_start + 1, gap_end - 1)
@@ -117,15 +152,17 @@ def optimize_day(
     params = pywrapcp.DefaultRoutingSearchParameters()
     params.first_solution_strategy = routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
     params.local_search_metaheuristic = routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
-    params.time_limit.seconds = SOLVE_SECONDS
+    params.time_limit.FromMilliseconds(min(MAX_SOLVE_MS, SOLVE_MS_PER_STOP * len(stops)))
     solution = routing.SolveWithParameters(params)
     if solution is None:
         return DayPlan([], [s.id for s in stops])
 
-    order = []
+    order, arrivals = [], {}
     index = solution.Value(routing.NextVar(start))
     while not routing.IsEnd(index):
-        order.append(stops[manager.IndexToNode(index) - 1].id)
+        stop_id = stops[manager.IndexToNode(index) - 1].id
+        order.append(stop_id)
+        arrivals[stop_id] = solution.Min(time.CumulVar(index))
         index = solution.Value(routing.NextVar(index))
     kept = set(order)
-    return DayPlan(order, [s.id for s in stops if s.id not in kept])
+    return DayPlan(order, [s.id for s in stops if s.id not in kept], arrivals)

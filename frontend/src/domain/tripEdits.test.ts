@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { testTrip, stop } from './testTrip';
-import { applyTripEdit, stopFromBacklog } from './tripEdits';
+import { defaultStayMinutes } from './timeline';
+import { applyTripEdit, STOP_COLOR_CYCLE, stopFromBacklog } from './tripEdits';
 
 const base = () => testTrip([stop('s1', 'a', 60), stop('s2', 'b', 30), stop('s3', 'c', 45)]);
 const stopIds = (trip: ReturnType<typeof base>) => trip.days[0].stops.map((s) => s.id);
@@ -54,6 +55,26 @@ describe('applyTripEdit', () => {
     const undone = applyTripEdit(changed, { type: 'replaceDayStops', dayNumber: 1, stops: original.days[0].stops });
     expect(undone.days[0].stops).toEqual(original.days[0].stops);
     expect(undone.backlog).toEqual(original.backlog);
+  });
+
+  it('puts every day and the backlog back for Undo after a build', () => {
+    const original = base();
+    const changed = applyTripEdit(original, { type: 'moveToBacklog', dayNumber: 1, stopId: 's1' });
+    const undone = applyTripEdit(changed, {
+      type: 'restorePlan',
+      days: original.days.map((d) => ({ dayNumber: d.number, stops: d.stops })),
+      backlog: original.backlog,
+    });
+    expect(undone.days).toEqual(original.days);
+    expect(undone.backlog).toEqual(original.backlog);
+  });
+
+  it('uses the same stop defaults as the backend', () => {
+    // Same values as backend/tests/test_build.py::test_defaults_match_the_frontend.
+    expect(defaultStayMinutes(['eat', 'explore'])).toBe(90);
+    expect(defaultStayMinutes(['experience'])).toBe(120);
+    expect(defaultStayMinutes([])).toBe(60);
+    expect(STOP_COLOR_CYCLE).toEqual(['green', 'blue', 'amber', 'ink']);
   });
 
   it('refuses to add a place that is not in the backlog', () => {
