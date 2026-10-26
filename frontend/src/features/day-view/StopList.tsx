@@ -14,6 +14,7 @@ import { formatClock, formatDistance, formatDuration, formatUsd } from '../../do
 import { backlogOpenAt, openTimeAtEnd } from '../../domain/schedule';
 import type { Timeline, TimelineStop } from '../../domain/timeline';
 import { stayForDay } from '../../domain/trip';
+import { stopFromBacklog } from '../../domain/tripEdits';
 import type { Day, FixedRow, LatLng, Leg } from '../../domain/types';
 import { useTrip } from '../../state/tripContext';
 import { Button } from '../../ui/Button';
@@ -213,7 +214,7 @@ function BacklogPicker({ dayNumber, near, fromMin }: PickerProps) {
           <Button
             variant="text"
             icon="plus"
-            onClick={() => edit({ type: 'addFromBacklog', dayNumber, placeId: place.id, stopId: crypto.randomUUID() })}
+            onClick={() => edit({ type: 'addFromBacklog', dayNumber, stop: stopFromBacklog(trip, dayNumber, place.id, crypto.randomUUID()) })}
           >
             Add
           </Button>

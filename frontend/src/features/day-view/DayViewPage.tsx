@@ -23,7 +23,7 @@ const VIEW_TABS: { id: ViewTab; label: string }[] = [
 
 export function DayViewPage() {
   const { dayNumber } = useParams();
-  const { trip } = useTrip();
+  const { trip, saveError } = useTrip();
   const [editingStopId, setEditingStopId] = useState<string | null>(null);
   const [tab, setTab] = useState<ViewTab>('list');
   const [mapOpen, setMapOpen] = useState(false);
@@ -57,6 +57,12 @@ export function DayViewPage() {
       </div>
 
       <main className={s.center}>
+        {saveError && (
+          <div className={s.banner} role="alert">
+            <Icon name="alert" size={18} />
+            <span>Your last change couldn't be saved. This is your trip as last saved.</span>
+          </div>
+        )}
         {unmatchedPosts > 0 && (
           <div className={s.banner} role="status">
             <Icon name="alert" size={18} />

@@ -1,3 +1,4 @@
+import { stopFromBacklog } from '../../domain/tripEdits';
 import { useTrip } from '../../state/tripContext';
 import { Button } from '../../ui/Button';
 import { ObjectiveChip } from '../../ui/Chip';
@@ -38,7 +39,7 @@ export function Backlog({ dayNumber }: { dayNumber: number }) {
                 </div>
                 <Button
                   icon="plus"
-                  onClick={() => edit({ type: 'addFromBacklog', dayNumber, placeId: place.id, stopId: crypto.randomUUID() })}
+                  onClick={() => edit({ type: 'addFromBacklog', dayNumber, stop: stopFromBacklog(trip, dayNumber, place.id, crypto.randomUUID()) })}
                 >
                   Day {dayNumber}
                 </Button>

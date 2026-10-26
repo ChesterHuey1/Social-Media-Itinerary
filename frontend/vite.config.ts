@@ -4,4 +4,6 @@ import { defineConfig } from 'vite'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  // The FastAPI backend runs on port 8000; see backend/README.md.
+  server: { proxy: { '/api': 'http://127.0.0.1:8000' } },
 })

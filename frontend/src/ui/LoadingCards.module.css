@@ -1,0 +1,30 @@
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: var(--s64) var(--s16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s48);
+}
+.card {
+  height: 160px;
+  padding: var(--s20);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s12);
+}
+.line,
+.lineShort {
+  height: var(--s16);
+  border-radius: var(--radius-tag);
+  background: var(--line-soft);
+}
+.line {
+  width: 60%;
+}
+.lineShort {
+  width: 35%;
+}

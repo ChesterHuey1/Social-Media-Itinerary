@@ -41,6 +41,10 @@ The saved list is per user, and a place saved after a trip is built must still r
 
 `flights` gains `buffer_min` (null uses the airport's value) and `big_luggage`. The arrival day starts when the picked transfer arrives at the hotel.
 
+### Place facts wait for Part 4
+
+For now `places` keeps cost and tip in its own columns, each with its source. The spec's `place_facts` table, one row per value with the page it came from, arrives in Part 4 with the fill-in pipeline that writes it.
+
 ### Budget
 
 - Categories are Flights, Stay, Food, Tickets and Transit. The spec listed four but filed flight costs under Flights.

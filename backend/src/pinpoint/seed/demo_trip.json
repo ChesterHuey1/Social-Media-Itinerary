@@ -1,0 +1,1245 @@
+{
+  "id": "demo",
+  "name": "Tokyo & Kyoto",
+  "startDate": "2026-11-12",
+  "endDate": "2026-11-17",
+  "travelers": 1,
+  "budgetUsd": 3000,
+  "places": {
+    "tsukiji": {
+      "id": "tsukiji",
+      "name": "Tsukiji Outer Market",
+      "area": "Chuo",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6654,
+        "lng": 139.7707
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 300,
+            "closeMin": 840
+          }
+        ]
+      },
+      "lastEntryMin": 30,
+      "cost": {
+        "usd": 20,
+        "per": "person",
+        "source": "deepseek"
+      },
+      "needsBooking": false,
+      "tip": {
+        "text": "Most stalls wind down by early afternoon. Go before 10 for the shortest lines.",
+        "source": "deepseek"
+      },
+      "objectives": [
+        "eat",
+        "explore"
+      ]
+    },
+    "teamlab": {
+      "id": "teamlab",
+      "name": "teamLab Planets",
+      "area": "Toyosu",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6491,
+        "lng": 139.7898
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 540,
+            "closeMin": 1320
+          }
+        ]
+      },
+      "lastEntryMin": 60,
+      "cost": {
+        "usd": 25,
+        "per": "ticket",
+        "source": "scrape"
+      },
+      "needsBooking": true,
+      "tip": {
+        "text": "Timed entry. Part of the walk is through shin-deep water, so wear clothes you can roll up.",
+        "source": "scrape"
+      },
+      "objectives": [
+        "experience",
+        "pictures"
+      ]
+    },
+    "ichiran": {
+      "id": "ichiran",
+      "name": "Ichiran Shibuya",
+      "area": "Shibuya",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6614,
+        "lng": 139.7016
+      },
+      "hours": {
+        "kind": "always"
+      },
+      "lastEntryMin": 0,
+      "cost": {
+        "usd": 15,
+        "per": "person",
+        "source": "deepseek"
+      },
+      "needsBooking": false,
+      "tip": {
+        "text": "Order at the ticket machine by the door, then fill in the flavor sheet at your booth.",
+        "source": "deepseek"
+      },
+      "objectives": [
+        "eat"
+      ]
+    },
+    "shibuyaSky": {
+      "id": "shibuyaSky",
+      "name": "Shibuya Sky",
+      "area": "Shibuya",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6584,
+        "lng": 139.7023
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 600,
+            "closeMin": 1350
+          }
+        ]
+      },
+      "lastEntryMin": 70,
+      "cost": {
+        "usd": 18,
+        "per": "ticket",
+        "source": "scrape"
+      },
+      "needsBooking": true,
+      "tip": {
+        "text": "Sunset time slots sell out first. Buy online for a set entry time.",
+        "source": "deepseek"
+      },
+      "objectives": [
+        "explore",
+        "pictures"
+      ]
+    },
+    "nonbei": {
+      "id": "nonbei",
+      "name": "Nonbei Yokocho",
+      "area": "Shibuya",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6596,
+        "lng": 139.7036
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 1020,
+            "closeMin": 1440
+          }
+        ]
+      },
+      "lastEntryMin": 30,
+      "cost": {
+        "usd": 25,
+        "per": "person",
+        "source": "deepseek"
+      },
+      "needsBooking": false,
+      "tip": {
+        "text": "Tiny bars that seat six to eight. Some charge a seat fee, so check the sign by the door.",
+        "source": "deepseek"
+      },
+      "objectives": [
+        "experience"
+      ]
+    },
+    "uobei": {
+      "id": "uobei",
+      "name": "Uobei Shibuya Dogenzaka",
+      "area": "Shibuya",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6575,
+        "lng": 139.6977
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "scrape",
+        "windows": [
+          {
+            "openMin": 660,
+            "closeMin": 1380
+          }
+        ]
+      },
+      "lastEntryMin": 30,
+      "cost": {
+        "usd": 15,
+        "per": "person",
+        "source": "deepseek"
+      },
+      "needsBooking": false,
+      "tip": {
+        "text": "Order on the tablet at your seat. Plates arrive on a rail a minute later.",
+        "source": "deepseek"
+      },
+      "objectives": [
+        "eat"
+      ]
+    },
+    "itoya": {
+      "id": "itoya",
+      "name": "Ginza Itoya",
+      "area": "Ginza",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.672,
+        "lng": 139.7672
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 600,
+            "closeMin": 1200
+          }
+        ]
+      },
+      "lastEntryMin": 30,
+      "cost": null,
+      "needsBooking": false,
+      "tip": {
+        "text": "Twelve floors of stationery. The top floor grows the lettuce served in the cafe.",
+        "source": "deepseek"
+      },
+      "objectives": [
+        "explore"
+      ]
+    },
+    "kagari": {
+      "id": "kagari",
+      "name": "Ginza Kagari",
+      "area": "Ginza",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6716,
+        "lng": 139.7625
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 660,
+            "closeMin": 1290
+          }
+        ]
+      },
+      "lastEntryMin": 30,
+      "cost": {
+        "usd": 12,
+        "per": "person",
+        "source": "deepseek"
+      },
+      "needsBooking": false,
+      "tip": {
+        "text": "Expect a line at dinner. It moves fast.",
+        "source": "deepseek"
+      },
+      "objectives": [
+        "eat"
+      ]
+    },
+    "sensoji": {
+      "id": "sensoji",
+      "name": "Senso-ji",
+      "area": "Asakusa",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.7148,
+        "lng": 139.7967
+      },
+      "hours": {
+        "kind": "always"
+      },
+      "lastEntryMin": 0,
+      "cost": null,
+      "needsBooking": false,
+      "tip": {
+        "text": "The grounds stay open after the main hall closes at 5 PM.",
+        "source": "deepseek"
+      },
+      "objectives": [
+        "explore",
+        "pictures"
+      ]
+    },
+    "ueno": {
+      "id": "ueno",
+      "name": "Ueno Park",
+      "area": "Ueno",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.7156,
+        "lng": 139.7745
+      },
+      "hours": {
+        "kind": "always"
+      },
+      "lastEntryMin": 0,
+      "cost": null,
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "explore"
+      ]
+    },
+    "meiji": {
+      "id": "meiji",
+      "name": "Meiji Jingu",
+      "area": "Harajuku",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6764,
+        "lng": 139.6993
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 400,
+            "closeMin": 980
+          }
+        ]
+      },
+      "lastEntryMin": 0,
+      "cost": null,
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "explore"
+      ]
+    },
+    "goldenGai": {
+      "id": "goldenGai",
+      "name": "Golden Gai",
+      "area": "Shinjuku",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6938,
+        "lng": 139.7036
+      },
+      "hours": {
+        "kind": "unconfirmed"
+      },
+      "lastEntryMin": 0,
+      "cost": null,
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "experience"
+      ]
+    },
+    "omoide": {
+      "id": "omoide",
+      "name": "Omoide Yokocho",
+      "area": "Shinjuku",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6929,
+        "lng": 139.6995
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 660,
+            "closeMin": 1380
+          }
+        ]
+      },
+      "lastEntryMin": 30,
+      "cost": {
+        "usd": 20,
+        "per": "person",
+        "source": "deepseek"
+      },
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "eat"
+      ]
+    },
+    "kappabashi": {
+      "id": "kappabashi",
+      "name": "Kappabashi Street",
+      "area": "Asakusa",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.7139,
+        "lng": 139.7884
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 600,
+            "closeMin": 1020
+          }
+        ]
+      },
+      "lastEntryMin": 0,
+      "cost": null,
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "explore"
+      ]
+    },
+    "fushimi": {
+      "id": "fushimi",
+      "name": "Fushimi Inari Taisha",
+      "area": "Fushimi",
+      "city": "Kyoto",
+      "location": {
+        "lat": 34.9671,
+        "lng": 135.7727
+      },
+      "hours": {
+        "kind": "always"
+      },
+      "lastEntryMin": 0,
+      "cost": null,
+      "needsBooking": false,
+      "tip": {
+        "text": "The crowds thin out past the halfway point of the climb.",
+        "source": "deepseek"
+      },
+      "objectives": [
+        "pictures",
+        "explore"
+      ]
+    },
+    "nishiki": {
+      "id": "nishiki",
+      "name": "Nishiki Market",
+      "area": "Nakagyo",
+      "city": "Kyoto",
+      "location": {
+        "lat": 35.005,
+        "lng": 135.7649
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 600,
+            "closeMin": 1080
+          }
+        ]
+      },
+      "lastEntryMin": 30,
+      "cost": {
+        "usd": 18,
+        "per": "person",
+        "source": "deepseek"
+      },
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "eat"
+      ]
+    },
+    "kinkakuji": {
+      "id": "kinkakuji",
+      "name": "Kinkaku-ji",
+      "area": "Kita",
+      "city": "Kyoto",
+      "location": {
+        "lat": 35.0394,
+        "lng": 135.7292
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 540,
+            "closeMin": 1020
+          }
+        ]
+      },
+      "lastEntryMin": 0,
+      "cost": {
+        "usd": 3,
+        "per": "ticket",
+        "source": "google"
+      },
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "pictures"
+      ]
+    },
+    "dotonbori": {
+      "id": "dotonbori",
+      "name": "Dotonbori",
+      "area": "Namba",
+      "city": "Osaka",
+      "location": {
+        "lat": 34.6687,
+        "lng": 135.5013
+      },
+      "hours": {
+        "kind": "always"
+      },
+      "lastEntryMin": 0,
+      "cost": null,
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "eat",
+        "explore"
+      ]
+    },
+    "gwangjang": {
+      "id": "gwangjang",
+      "name": "Gwangjang Market",
+      "area": "Jongno",
+      "city": "Seoul",
+      "location": {
+        "lat": 37.5701,
+        "lng": 127.0099
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 540,
+            "closeMin": 1380
+          }
+        ]
+      },
+      "lastEntryMin": 30,
+      "cost": null,
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "eat"
+      ]
+    }
+  },
+  "stays": [
+    {
+      "id": "ginza",
+      "name": "Mitsui Garden Hotel Ginza Premier",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.6672,
+        "lng": 139.764
+      },
+      "checkInDate": "2026-11-12",
+      "checkOutDate": "2026-11-15",
+      "checkInMin": 900,
+      "checkOutMin": 660,
+      "costUsd": 420
+    },
+    {
+      "id": "kanra",
+      "name": "Hotel Kanra Kyoto",
+      "city": "Kyoto",
+      "location": {
+        "lat": 34.9978,
+        "lng": 135.759
+      },
+      "checkInDate": "2026-11-15",
+      "checkOutDate": "2026-11-17",
+      "checkInMin": 900,
+      "checkOutMin": 660,
+      "costUsd": 220
+    }
+  ],
+  "flights": [
+    {
+      "id": "out",
+      "airline": "Japan Airlines",
+      "number": "JL 1",
+      "from": "SFO",
+      "to": "HND",
+      "date": "2026-11-12",
+      "timeMin": 700,
+      "direction": "arrive",
+      "international": true,
+      "costUsd": 980
+    },
+    {
+      "id": "home",
+      "airline": "Japan Airlines",
+      "number": "JL 61",
+      "from": "KIX",
+      "to": "SFO",
+      "date": "2026-11-17",
+      "timeMin": 975,
+      "direction": "depart",
+      "international": true,
+      "costUsd": null
+    }
+  ],
+  "days": [
+    {
+      "number": 1,
+      "date": "2026-11-12",
+      "title": "Ginza on arrival",
+      "stayId": "ginza",
+      "note": "Land 11:40 AM, 90 min for immigration and bags, 40 min to the hotel",
+      "startMin": 830,
+      "endMin": 1260,
+      "startRows": [
+        {
+          "kind": "flight",
+          "text": "Land at HND",
+          "atMin": 700
+        },
+        {
+          "kind": "hotel",
+          "text": "Drop bags at Mitsui Garden Hotel Ginza Premier",
+          "atMin": 830
+        }
+      ],
+      "endRows": [
+        {
+          "kind": "hotel",
+          "text": "Check in: Mitsui Garden Hotel Ginza Premier",
+          "atMin": 1260
+        }
+      ],
+      "stops": [
+        {
+          "id": "d1s1",
+          "placeId": "itoya",
+          "title": null,
+          "color": "blue",
+          "objectives": [
+            "explore"
+          ],
+          "stay": {
+            "minutes": 75,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        },
+        {
+          "id": "d1s2",
+          "placeId": "kagari",
+          "title": null,
+          "color": "amber",
+          "objectives": [
+            "eat"
+          ],
+          "stay": {
+            "minutes": 45,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 2,
+      "date": "2026-11-13",
+      "title": "Markets, art and Shibuya",
+      "stayId": "ginza",
+      "note": null,
+      "startMin": 510,
+      "endMin": 1290,
+      "startRows": [
+        {
+          "kind": "hotel",
+          "text": "Leave Mitsui Garden Hotel Ginza Premier",
+          "atMin": 510
+        }
+      ],
+      "endRows": [
+        {
+          "kind": "hotel",
+          "text": "Back at Mitsui Garden Hotel Ginza Premier",
+          "atMin": 1290
+        }
+      ],
+      "stops": [
+        {
+          "id": "d2s1",
+          "placeId": "tsukiji",
+          "title": null,
+          "color": "amber",
+          "objectives": [
+            "eat",
+            "explore"
+          ],
+          "stay": {
+            "minutes": 90,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        },
+        {
+          "id": "d2s2",
+          "placeId": "teamlab",
+          "title": null,
+          "color": "blue",
+          "objectives": [
+            "experience",
+            "pictures"
+          ],
+          "stay": {
+            "minutes": 120,
+            "source": "user"
+          },
+          "lockedAtMin": 660,
+          "comments": [
+            {
+              "id": "c1",
+              "body": "QR tickets are in the confirmation email.",
+              "createdAt": "2026-10-20"
+            }
+          ]
+        },
+        {
+          "id": "d2s3",
+          "placeId": "ichiran",
+          "title": null,
+          "color": "green",
+          "objectives": [
+            "eat"
+          ],
+          "stay": {
+            "minutes": 45,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        },
+        {
+          "id": "d2s4",
+          "placeId": "shibuyaSky",
+          "title": null,
+          "color": "ink",
+          "objectives": [
+            "explore",
+            "pictures"
+          ],
+          "stay": {
+            "minutes": 75,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        },
+        {
+          "id": "d2s5",
+          "placeId": "nonbei",
+          "title": null,
+          "color": "amber",
+          "objectives": [
+            "experience"
+          ],
+          "stay": {
+            "minutes": 45,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        },
+        {
+          "id": "d2s6",
+          "placeId": "uobei",
+          "title": null,
+          "color": "green",
+          "objectives": [
+            "eat"
+          ],
+          "stay": {
+            "minutes": 60,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "date": "2026-11-14",
+      "title": "Asakusa and Ueno",
+      "stayId": "ginza",
+      "note": null,
+      "startMin": 510,
+      "endMin": 1290,
+      "startRows": [
+        {
+          "kind": "hotel",
+          "text": "Leave Mitsui Garden Hotel Ginza Premier",
+          "atMin": 510
+        }
+      ],
+      "endRows": [
+        {
+          "kind": "hotel",
+          "text": "Back at Mitsui Garden Hotel Ginza Premier",
+          "atMin": 1290
+        }
+      ],
+      "stops": [
+        {
+          "id": "d3s1",
+          "placeId": "sensoji",
+          "title": null,
+          "color": "amber",
+          "objectives": [
+            "explore",
+            "pictures"
+          ],
+          "stay": {
+            "minutes": 75,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        },
+        {
+          "id": "d3s2",
+          "placeId": "ueno",
+          "title": null,
+          "color": "green",
+          "objectives": [
+            "explore"
+          ],
+          "stay": {
+            "minutes": 90,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "date": "2026-11-15",
+      "title": "Move to Kyoto",
+      "stayId": "kanra",
+      "note": "Out by 11:00 AM, in from 3:00 PM. A Drop bags stop fills the gap.",
+      "startMin": 540,
+      "endMin": 1260,
+      "startRows": [
+        {
+          "kind": "hotel",
+          "text": "Check out: Mitsui Garden Hotel Ginza Premier",
+          "atMin": 540
+        }
+      ],
+      "endRows": [
+        {
+          "kind": "hotel",
+          "text": "Check in: Hotel Kanra Kyoto",
+          "atMin": 1260
+        }
+      ],
+      "stops": []
+    },
+    {
+      "number": 5,
+      "date": "2026-11-16",
+      "title": "Shrines and Nishiki",
+      "stayId": "kanra",
+      "note": null,
+      "startMin": 510,
+      "endMin": 1290,
+      "startRows": [
+        {
+          "kind": "hotel",
+          "text": "Leave Hotel Kanra Kyoto",
+          "atMin": 510
+        }
+      ],
+      "endRows": [
+        {
+          "kind": "hotel",
+          "text": "Back at Hotel Kanra Kyoto",
+          "atMin": 1290
+        }
+      ],
+      "stops": [
+        {
+          "id": "d5s1",
+          "placeId": "fushimi",
+          "title": null,
+          "color": "amber",
+          "objectives": [
+            "pictures",
+            "explore"
+          ],
+          "stay": {
+            "minutes": 120,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        },
+        {
+          "id": "d5s2",
+          "placeId": "nishiki",
+          "title": null,
+          "color": "green",
+          "objectives": [
+            "eat"
+          ],
+          "stay": {
+            "minutes": 60,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        },
+        {
+          "id": "d5s3",
+          "placeId": "kinkakuji",
+          "title": null,
+          "color": "blue",
+          "objectives": [
+            "pictures"
+          ],
+          "stay": {
+            "minutes": 75,
+            "source": "estimate"
+          },
+          "lockedAtMin": null,
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 6,
+      "date": "2026-11-17",
+      "title": "Fly home",
+      "stayId": "kanra",
+      "note": "Departs 4:15 PM, 3 h at the airport, 60 min to KIX",
+      "startMin": 510,
+      "endMin": 735,
+      "startRows": [
+        {
+          "kind": "hotel",
+          "text": "Check out: Hotel Kanra Kyoto",
+          "atMin": 510
+        }
+      ],
+      "endRows": [
+        {
+          "kind": "flight",
+          "text": "Leave for KIX",
+          "atMin": 735
+        }
+      ],
+      "stops": []
+    }
+  ],
+  "legs": {
+    "ginza>itoya": {
+      "mode": "walk",
+      "minutes": 8,
+      "distanceM": 600,
+      "line": null,
+      "fareUsd": null,
+      "source": "routes"
+    },
+    "itoya>kagari": {
+      "mode": "walk",
+      "minutes": 6,
+      "distanceM": 400,
+      "line": null,
+      "fareUsd": null,
+      "source": "routes"
+    },
+    "kagari>ginza": {
+      "mode": "walk",
+      "minutes": 5,
+      "distanceM": 350,
+      "line": null,
+      "fareUsd": null,
+      "source": "routes"
+    },
+    "ginza>tsukiji": {
+      "mode": "walk",
+      "minutes": 12,
+      "distanceM": 900,
+      "line": null,
+      "fareUsd": null,
+      "source": "routes"
+    },
+    "tsukiji>teamlab": {
+      "mode": "transit",
+      "minutes": 25,
+      "distanceM": 4200,
+      "line": "Yurikamome Line",
+      "fareUsd": 2.1,
+      "source": "routes"
+    },
+    "teamlab>ichiran": {
+      "mode": "transit",
+      "minutes": 38,
+      "distanceM": 11000,
+      "line": "Yurikamome, then Ginza Line",
+      "fareUsd": 2.6,
+      "source": "routes"
+    },
+    "ichiran>shibuyaSky": {
+      "mode": "walk",
+      "minutes": 8,
+      "distanceM": 550,
+      "line": null,
+      "fareUsd": null,
+      "source": "routes"
+    },
+    "shibuyaSky>nonbei": {
+      "mode": "walk",
+      "minutes": 10,
+      "distanceM": 700,
+      "line": null,
+      "fareUsd": null,
+      "source": "routes"
+    },
+    "nonbei>uobei": {
+      "mode": "walk",
+      "minutes": 9,
+      "distanceM": 650,
+      "line": null,
+      "fareUsd": null,
+      "source": "routes"
+    },
+    "uobei>ginza": {
+      "mode": "transit",
+      "minutes": 28,
+      "distanceM": 6400,
+      "line": "Ginza Line",
+      "fareUsd": 1.4,
+      "source": "routes"
+    },
+    "ginza>sensoji": {
+      "mode": "transit",
+      "minutes": 25,
+      "distanceM": 5800,
+      "line": "Ginza Line",
+      "fareUsd": 1.4,
+      "source": "routes"
+    },
+    "sensoji>ueno": {
+      "mode": "walk",
+      "minutes": 25,
+      "distanceM": 2000,
+      "line": null,
+      "fareUsd": null,
+      "source": "routes"
+    },
+    "ueno>ginza": {
+      "mode": "transit",
+      "minutes": 22,
+      "distanceM": 5200,
+      "line": "Ginza Line",
+      "fareUsd": 1.4,
+      "source": "routes"
+    },
+    "kanra>fushimi": {
+      "mode": "transit",
+      "minutes": 15,
+      "distanceM": 4000,
+      "line": "JR Nara Line",
+      "fareUsd": 1,
+      "source": "routes"
+    },
+    "fushimi>nishiki": {
+      "mode": "transit",
+      "minutes": 25,
+      "distanceM": 5500,
+      "line": "Keihan Line",
+      "fareUsd": 1.7,
+      "source": "routes"
+    },
+    "nishiki>kinkakuji": {
+      "mode": "transit",
+      "minutes": 40,
+      "distanceM": 7000,
+      "line": "City Bus 205",
+      "fareUsd": 1.6,
+      "source": "routes"
+    },
+    "kinkakuji>kanra": {
+      "mode": "transit",
+      "minutes": 35,
+      "distanceM": 7500,
+      "line": "City Bus 205",
+      "fareUsd": 1.6,
+      "source": "routes"
+    }
+  },
+  "backlog": [
+    {
+      "placeId": "meiji",
+      "reason": "Closes at 4:20 PM. With this order you'd get there at 4:45 PM."
+    },
+    {
+      "placeId": "goldenGai",
+      "reason": "From a Reel. Hours not confirmed."
+    },
+    {
+      "placeId": "kappabashi",
+      "reason": "Added by search. Fits Day 3."
+    },
+    {
+      "placeId": "omoide",
+      "reason": "From a Reel. Didn't fit Day 2."
+    }
+  ],
+  "expenses": [
+    {
+      "id": "e2",
+      "amountUsd": 60,
+      "category": "tickets",
+      "note": "teamLab and Shibuya Sky",
+      "date": "2026-10-20"
+    },
+    {
+      "id": "e1",
+      "amountUsd": 160,
+      "category": "food",
+      "note": "Meals so far",
+      "date": "2026-11-12"
+    },
+    {
+      "id": "e3",
+      "amountUsd": 20,
+      "category": "transit",
+      "note": "Suica top-up",
+      "date": "2026-11-12"
+    }
+  ],
+  "savedPlaces": [
+    {
+      "placeId": "ichiran",
+      "from": "reel",
+      "reelCount": 1,
+      "included": true
+    },
+    {
+      "placeId": "teamlab",
+      "from": "reel",
+      "reelCount": 2,
+      "included": true
+    },
+    {
+      "placeId": "tsukiji",
+      "from": "search",
+      "reelCount": 0,
+      "included": true
+    },
+    {
+      "placeId": "shibuyaSky",
+      "from": "reel",
+      "reelCount": 1,
+      "included": true
+    },
+    {
+      "placeId": "nonbei",
+      "from": "reel",
+      "reelCount": 1,
+      "included": true
+    },
+    {
+      "placeId": "uobei",
+      "from": "search",
+      "reelCount": 0,
+      "included": true
+    },
+    {
+      "placeId": "goldenGai",
+      "from": "reel",
+      "reelCount": 1,
+      "included": false
+    },
+    {
+      "placeId": "meiji",
+      "from": "reel",
+      "reelCount": 1,
+      "included": true
+    },
+    {
+      "placeId": "fushimi",
+      "from": "reel",
+      "reelCount": 1,
+      "included": true
+    },
+    {
+      "placeId": "nishiki",
+      "from": "search",
+      "reelCount": 0,
+      "included": true
+    },
+    {
+      "placeId": "kinkakuji",
+      "from": "reel",
+      "reelCount": 1,
+      "included": true
+    },
+    {
+      "placeId": "dotonbori",
+      "from": "reel",
+      "reelCount": 1,
+      "included": false
+    },
+    {
+      "placeId": "gwangjang",
+      "from": "reel",
+      "reelCount": 1,
+      "included": false
+    }
+  ],
+  "savedPosts": [
+    {
+      "id": "p1",
+      "url": "https://www.instagram.com/reel/placeholder1/",
+      "status": "done"
+    },
+    {
+      "id": "p2",
+      "url": "https://www.instagram.com/reel/placeholder2/",
+      "status": "needs_review"
+    }
+  ]
+}

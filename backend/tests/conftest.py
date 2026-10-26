@@ -1,0 +1,53 @@
+"""Tests run against TEST_DATABASE_URL. The schema is rebuilt from the migrations once per run,
+which also proves the migrations work, and every test runs in a transaction that is rolled back."""
+
+from collections.abc import Iterator
+
+import pytest
+from alembic import command
+from alembic.config import Config
+from fastapi.testclient import TestClient
+from sqlalchemy import Engine, create_engine, text
+from sqlalchemy.orm import Session
+
+from pinpoint.config import BACKEND_DIR, get_settings
+from pinpoint.db import get_session
+from pinpoint.main import app
+from pinpoint.seed import seed_demo
+
+
+@pytest.fixture(scope="session")
+def engine() -> Iterator[Engine]:
+    url = get_settings().test_database_url
+    if not url:
+        pytest.exit("Set TEST_DATABASE_URL in backend/.env to run the tests.")
+    engine = create_engine(url)
+    with engine.begin() as conn:
+        conn.execute(text("DROP SCHEMA public CASCADE; CREATE SCHEMA public;"))
+    config = Config(BACKEND_DIR / "alembic.ini")
+    config.set_main_option("script_location", str(BACKEND_DIR / "migrations"))
+    config.set_main_option("sqlalchemy.url", url.replace("%", "%%"))
+    command.upgrade(config, "head")
+    yield engine
+    engine.dispose()
+
+
+@pytest.fixture
+def session(engine: Engine) -> Iterator[Session]:
+    with engine.connect() as conn:
+        outer = conn.begin()
+        session = Session(bind=conn, join_transaction_mode="create_savepoint", expire_on_commit=False)
+        seed_demo(session)
+        # Commit releases the savepoint into the outer transaction, so a rollback after a
+        # rejected edit undoes only that edit, never the seed.
+        session.commit()
+        yield session
+        session.close()
+        outer.rollback()
+
+
+@pytest.fixture
+def client(session: Session) -> Iterator[TestClient]:
+    app.dependency_overrides[get_session] = lambda: session
+    yield TestClient(app)
+    app.dependency_overrides.clear()

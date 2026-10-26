@@ -6,6 +6,7 @@
 //   5. the page never scrolls sideways.
 // Runs at the three layout widths from the spec. `npm run test:layout`.
 // Uses the Edge installed on the machine; set LAYOUT_BROWSER=chrome to use Chrome instead.
+import { readFileSync } from 'node:fs';
 import { chromium } from 'playwright-core';
 import { createServer } from 'vite';
 
@@ -17,6 +18,8 @@ const WIDTHS = [
 ];
 const PAGES = ['/trip/day/1', '/trip/day/2', '/trip/day/4', '/setup'];
 const TOLERANCE_PX = 1;
+// The API is answered with the backend's seed file, so this test needs no database.
+const SEED = JSON.parse(readFileSync(new URL('../../backend/src/pinpoint/seed/demo_trip.json', import.meta.url), 'utf8'));
 
 const server = await createServer({ logLevel: 'error', server: { port: 0 } });
 await server.listen();
@@ -27,6 +30,7 @@ const failures = [];
 try {
   for (const size of WIDTHS) {
     const page = await browser.newPage({ viewport: { width: size.width, height: size.height } });
+    await page.route('**/api/trips/demo', (route) => route.fulfill({ json: SEED }));
     for (const path of PAGES) {
       await page.goto(base + path, { waitUntil: 'networkidle' });
       await page.evaluate(() => document.fonts.ready);

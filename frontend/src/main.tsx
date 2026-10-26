@@ -1,9 +1,11 @@
-import { StrictMode } from 'react';
+import { StrictMode, Suspense } from 'react';
 import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { DayViewPage } from './features/day-view/DayViewPage';
 import { TripSetupPage } from './features/trip-setup/TripSetupPage';
 import { TripProvider } from './state/TripProvider';
+import { LoadError } from './ui/LoadError';
+import { LoadingCards } from './ui/LoadingCards';
 import './styles/tokens.css';
 
 const router = createBrowserRouter([
@@ -14,8 +16,12 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <TripProvider>
-      <RouterProvider router={router} />
-    </TripProvider>
+    <LoadError>
+      <Suspense fallback={<LoadingCards />}>
+        <TripProvider>
+          <RouterProvider router={router} />
+        </TripProvider>
+      </Suspense>
+    </LoadError>
   </StrictMode>,
 );
