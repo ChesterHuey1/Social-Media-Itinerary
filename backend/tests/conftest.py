@@ -10,6 +10,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.orm import Session
 
+from pinpoint import auth
 from pinpoint.config import BACKEND_DIR, get_settings
 from pinpoint.db import get_session
 from pinpoint.main import app
@@ -46,8 +47,31 @@ def session(engine: Engine) -> Iterator[Session]:
         outer.rollback()
 
 
+TEST_PASSWORD = "correct horse battery"
+
+
+@pytest.fixture(scope="session", autouse=True)
+def login_settings() -> Iterator[None]:
+    """A known password and session secret for every test, whatever backend/.env holds."""
+    settings = get_settings()
+    saved = (settings.app_password_hash, settings.session_secret)
+    settings.app_password_hash = auth.hash_password(TEST_PASSWORD)
+    settings.session_secret = "test-secret"
+    yield
+    settings.app_password_hash, settings.session_secret = saved
+
+
 @pytest.fixture
-def client(session: Session) -> Iterator[TestClient]:
+def anon_client(session: Session) -> Iterator[TestClient]:
+    """Not signed in."""
+    auth._failures.clear()
     app.dependency_overrides[get_session] = lambda: session
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def client(anon_client: TestClient) -> TestClient:
+    """Signed in."""
+    assert anon_client.post("/api/auth/login", json={"password": TEST_PASSWORD}).status_code == 204
+    return anon_client

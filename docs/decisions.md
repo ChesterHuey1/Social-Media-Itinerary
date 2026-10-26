@@ -102,6 +102,16 @@ After landing, the app lists real ways to reach the hotel and lets you pick one.
 
 Until API keys exist, all searches return mock options.
 
+## Login
+
+The spec says one account, a password hash in `.env`, a session cookie and HTTPS only.
+
+- The hash is scrypt from Python's standard library, set with `uv run python -m pinpoint.auth set-password`.
+- The cookie holds an expiry and its HMAC with `SESSION_SECRET`, so the server stores no sessions. It lasts 30 days and is HttpOnly and SameSite=Lax.
+- `COOKIE_SECURE=true` marks the cookie HTTPS only. It stays false while the app runs on localhost over plain HTTP, and must be turned on before the Instagram tunnel opens.
+- Five wrong passwords from one address within 10 minutes block sign-in from that address until the window passes.
+- Every `/api` route except sign-in and health needs the cookie. `tests/test_auth.py` fails when a route is left open.
+
 ## Usability
 
 | Problem | Decision |

@@ -2,11 +2,8 @@ import { use, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { applyTripEdit, type TripEdit } from '../domain/tripEdits';
 import type { Trip } from '../domain/types';
-import { buildItinerary, fetchTrip, optimizeDay, saveEdit, TRIP_ID, type BuildResult, type OptimizeResult } from './api';
+import { buildItinerary, fetchTrip, loadTrip, optimizeDay, saveEdit, TRIP_ID, type BuildResult, type OptimizeResult } from './api';
 import { TripContext } from './tripContext';
-
-// Started once, outside render, and read with use() so loading needs no effect.
-const initialTrip = fetchTrip(TRIP_ID);
 
 /** Swaps in a new trip with a View Transition, so cards glide to new spots (300 ms, set in tokens.css). */
 function showWithTransition(update: () => void) {
@@ -21,7 +18,7 @@ function showWithTransition(update: () => void) {
  * Optimize route and Build itinerary wait their turn behind pending saves, then show the server's result.
  */
 export function TripProvider({ children }: { children: ReactNode }) {
-  const [trip, setTrip] = useState<Trip>(use(initialTrip));
+  const [trip, setTrip] = useState<Trip>(use(loadTrip()));
   const [saveError, setSaveError] = useState(false);
   const queue = useRef<Promise<void>>(Promise.resolve());
   const inFlight = useRef(0);

@@ -1,0 +1,27 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--s16);
+}
+.card {
+  width: 100%;
+  max-width: 360px;
+  padding: var(--s32);
+  border-radius: var(--radius-card);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s20);
+}
+.title {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+}
+.error {
+  color: var(--warn-text);
+  font-size: 14px;
+}

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 import { DayViewPage } from './features/day-view/DayViewPage';
 import { TripSetupPage } from './features/trip-setup/TripSetupPage';
+import { SignedInGate } from './state/SignedInGate';
 import { TripProvider } from './state/TripProvider';
 import { LoadError } from './ui/LoadError';
 import { LoadingCards } from './ui/LoadingCards';
@@ -18,9 +19,11 @@ createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <LoadError>
       <Suspense fallback={<LoadingCards />}>
-        <TripProvider>
-          <RouterProvider router={router} />
-        </TripProvider>
+        <SignedInGate>
+          <TripProvider>
+            <RouterProvider router={router} />
+          </TripProvider>
+        </SignedInGate>
       </Suspense>
     </LoadError>
   </StrictMode>,

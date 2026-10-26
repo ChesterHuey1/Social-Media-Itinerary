@@ -26,12 +26,22 @@ export const TRIP_ID = 'demo';
 
 async function request<T = Trip>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...init });
+  // The session ran out: reloading shows sign-in.
+  if (response.status === 401) window.location.reload();
   if (!response.ok) throw new Error(`${init?.method ?? 'GET'} ${path} failed: ${response.status} ${await response.text()}`);
   return (await response.json()) as T;
 }
 
 export function fetchTrip(id: string): Promise<Trip> {
   return request(`/api/trips/${id}`);
+}
+
+let firstLoad: Promise<Trip> | null = null;
+
+/** The first load of the trip, started once and read with use(), so loading needs no effect. Starts only after sign-in. */
+export function loadTrip(): Promise<Trip> {
+  firstLoad ??= fetchTrip(TRIP_ID);
+  return firstLoad;
 }
 
 /** Saves one edit; the server answers with the trip as stored. */

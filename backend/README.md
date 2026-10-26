@@ -12,7 +12,10 @@ FastAPI + Postgres. One API for the website (and later the Instagram bot).
 uv sync
 uv run alembic upgrade head      # create the tables
 uv run python -m pinpoint.seed   # load the sample Tokyo and Kyoto trip (safe to rerun)
+uv run python -m pinpoint.auth set-password   # the password the website asks for; only its hash goes in .env
 ```
+
+Run `set-password` again to change the password. Changing `SESSION_SECRET` in `.env` signs every browser out.
 
 ## Run
 

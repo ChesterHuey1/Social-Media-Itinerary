@@ -14,6 +14,12 @@ class Settings(BaseSettings):
     database_url: str
     test_database_url: str | None = None
 
+    # Login. Set with: uv run python -m pinpoint.auth set-password
+    app_password_hash: str = ""
+    session_secret: str = ""
+    # True once the site is served over HTTPS (the Instagram webhook tunnel), so the cookie never goes over plain HTTP.
+    cookie_secure: bool = False
+
     # Empty means "use the mock service". See docs/decisions.md.
     google_maps_api_key: str = ""
     deepseek_api_key: str = ""
