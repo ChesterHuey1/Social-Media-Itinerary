@@ -7,6 +7,7 @@ import { Icon } from '../../ui/Icon';
 import s from './DayView.module.css';
 
 export function Sidebar({ trip, activeDay }: { trip: Trip; activeDay: number }) {
+  const newSaves = trip.savedPlaces.filter((sp) => sp.status === 'new').length;
   return (
     <aside className={s.sidebar}>
       <section className={cx(s.group, s.tripGroup)}>
@@ -47,6 +48,15 @@ export function Sidebar({ trip, activeDay }: { trip: Trip; activeDay: number }) 
           <span>Backlog</span>
           <span className={s.pill}>{trip.backlog.length}</span>
         </a>
+        {newSaves > 0 && (
+          <a href="#new-saves" className={cx(s.dayRow, s.backlogRow)}>
+            <span className={s.dayNum}>
+              <Icon name="plus" />
+            </span>
+            <span>New saves</span>
+            <span className={s.pill}>{newSaves}</span>
+          </a>
+        )}
       </nav>
 
       <div className={s.budgetGroup}>

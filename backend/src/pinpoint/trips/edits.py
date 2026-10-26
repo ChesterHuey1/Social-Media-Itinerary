@@ -9,6 +9,9 @@ from sqlalchemy.orm import Session
 
 from pinpoint import models, schemas
 
+# Same text as frontend/src/domain/tripEdits.ts.
+SAVED_LATER = "Saved after the trip was built."
+
 
 class EditRejected(Exception):
     """The edit names something that does not exist on this trip."""
@@ -51,6 +54,34 @@ def _set_day_stops(day: models.Day, wanted: list[schemas.Stop], pool: dict[str, 
         stop.locked_at_min = new.locked_at_min
         stops.append(stop)
     day.stops = stops
+
+
+def _append_stop(day: models.Day, new: schemas.Stop) -> None:
+    day.stops.append(
+        models.Stop(
+            id=new.id,
+            place_id=new.place_id,
+            position=len(day.stops),
+            title=new.title,
+            color=new.color,
+            objectives=new.objectives,
+            stay_minutes=new.stay.minutes,
+            stay_source=new.stay.source,
+            locked_at_min=new.locked_at_min,
+        )
+    )
+
+
+def _new_save(session: Session, trip_id: str, place_id: str) -> models.SavedPlace:
+    """A saved place of this trip's user that is still new. Adding it marks it as used by the trip."""
+    user_id = session.scalar(select(models.Trip.user_id).where(models.Trip.id == trip_id))
+    saved = session.scalar(
+        select(models.SavedPlace).where(models.SavedPlace.user_id == user_id, models.SavedPlace.place_id == place_id)
+    )
+    if saved is None or saved.status != "new":
+        raise EditRejected(f"{place_id} is not a new saved place")
+    saved.status = "in_trip"
+    return saved
 
 
 def apply_edit(session: Session, trip_id: str, edit: schemas.TripEdit) -> None:
@@ -143,6 +174,20 @@ def apply_edit(session: Session, trip_id: str, edit: schemas.TripEdit) -> None:
                     models.BacklogItem(trip_id=trip_id, place_id=item.place_id, reason=item.reason, position=position)
                 )
 
+        case schemas.SavedToDay(day_number=n, stop=new):
+            day = _day(session, trip_id, n)
+            _new_save(session, trip_id, new.place_id)
+            _append_stop(day, new)
+
+        case schemas.SavedToBacklog(place_id=place_id):
+            _new_save(session, trip_id, place_id)
+            last = session.scalar(
+                select(func.max(models.BacklogItem.position)).where(models.BacklogItem.trip_id == trip_id)
+            )
+            session.add(
+                models.BacklogItem(trip_id=trip_id, place_id=place_id, reason=SAVED_LATER, position=(last or 0) + 1)
+            )
+
         case schemas.AddFromBacklog(day_number=n, stop=new):
             day = _day(session, trip_id, n)
             item = session.scalar(
@@ -153,16 +198,4 @@ def apply_edit(session: Session, trip_id: str, edit: schemas.TripEdit) -> None:
             if item is None:
                 raise EditRejected(f"{new.place_id} is not in the backlog")
             session.delete(item)
-            day.stops.append(
-                models.Stop(
-                    id=new.id,
-                    place_id=new.place_id,
-                    position=len(day.stops),
-                    title=new.title,
-                    color=new.color,
-                    objectives=new.objectives,
-                    stay_minutes=new.stay.minutes,
-                    stay_source=new.stay.source,
-                    locked_at_min=new.locked_at_min,
-                )
-            )
+            _append_stop(day, new)

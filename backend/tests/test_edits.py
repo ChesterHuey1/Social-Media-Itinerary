@@ -138,3 +138,38 @@ def test_move_to_the_same_day_changes_nothing_and_a_missing_day_is_refused(clien
     edit(client, {"type": "moveToDay", "dayNumber": 2, "stopId": "d2s2", "toDayNumber": 2})
     assert stop_ids(client) == before
     edit(client, {"type": "moveToDay", "dayNumber": 2, "stopId": "d2s2", "toDayNumber": 9}, status=409)
+
+
+def saved_status(client: TestClient, place_id: str) -> str:
+    saved = client.get("/api/trips/demo").json()["savedPlaces"]
+    return next(sp["status"] for sp in saved if sp["placeId"] == place_id)
+
+
+def yanaka_stop(stop_id: str = "y1") -> dict[str, Any]:
+    return {
+        "id": stop_id,
+        "placeId": "yanaka",
+        "title": None,
+        "color": "green",
+        "objectives": ["eat", "explore"],
+        "stay": {"minutes": 60, "source": "estimate"},
+        "lockedAtMin": None,
+        "comments": [],
+    }
+
+
+def test_a_new_save_goes_to_the_end_of_a_day_and_stops_being_new(client: TestClient) -> None:
+    assert saved_status(client, "yanaka") == "new"
+    edit(client, {"type": "savedToDay", "dayNumber": 3, "stop": yanaka_stop()})
+    assert day(client, 3)["stops"][-1] == yanaka_stop()
+    assert saved_status(client, "yanaka") == "in_trip"
+    # Only once.
+    edit(client, {"type": "savedToDay", "dayNumber": 2, "stop": yanaka_stop("y2")}, status=409)
+
+
+def test_a_new_save_goes_to_the_end_of_the_backlog(client: TestClient) -> None:
+    edit(client, {"type": "savedToBacklog", "placeId": "dotonbori"})
+    backlog = client.get("/api/trips/demo").json()["backlog"]
+    assert backlog[-1] == {"placeId": "dotonbori", "reason": "Saved after the trip was built."}
+    assert saved_status(client, "dotonbori") == "in_trip"
+    edit(client, {"type": "savedToBacklog", "placeId": "meiji"}, status=409)

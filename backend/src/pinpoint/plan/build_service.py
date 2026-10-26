@@ -56,12 +56,10 @@ def build_trip(session: Session, trip_id: str, included_place_ids: list[str]) ->
     unlisted = [s.place_id for d in days for s in d.stops if s.place_id not in saved_ids]
     included = list(dict.fromkeys([*included_place_ids, *unlisted]))
 
-    # The saved list remembers which places this trip uses.
+    # The saved list remembers which places this trip uses. Unchecked ones were seen and left out, so they stop
+    # counting as new.
     for saved in session.scalars(select(models.SavedPlace).where(models.SavedPlace.user_id == trip.user_id)):
-        if saved.place_id in included:
-            saved.status = "in_trip"
-        elif saved.status == "in_trip":
-            saved.status = "new"
+        saved.status = "in_trip" if saved.place_id in included else "dismissed"
 
     existing = {s.place_id: s for d in days for s in d.stops}
     locked = {s.place_id for d in days for s in d.stops if s.locked_at_min is not None}

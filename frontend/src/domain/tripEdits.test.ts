@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { testTrip, stop } from './testTrip';
 import { defaultStayMinutes } from './timeline';
-import { applyTripEdit, STOP_COLOR_CYCLE, stopFromBacklog } from './tripEdits';
+import { applyTripEdit, SAVED_LATER, STOP_COLOR_CYCLE, stopFromBacklog } from './tripEdits';
 
 const base = () => testTrip([stop('s1', 'a', 60), stop('s2', 'b', 30), stop('s3', 'c', 45)]);
 const stopIds = (trip: ReturnType<typeof base>) => trip.days[0].stops.map((s) => s.id);
@@ -92,5 +92,17 @@ describe('applyTripEdit', () => {
     expect(moved.days[1].stops[1].lockedAtMin).toBeNull();
     expect(applyTripEdit(trip, { type: 'moveToDay', dayNumber: 1, stopId: 's2', toDayNumber: 1 })).toBe(trip);
     expect(applyTripEdit(trip, { type: 'moveToDay', dayNumber: 1, stopId: 's2', toDayNumber: 9 })).toBe(trip);
+  });
+
+  it('puts a new save on a day or in the backlog, once', () => {
+    const trip = { ...base(), savedPlaces: [{ placeId: 'd', from: 'reel' as const, reelCount: 1, status: 'new' as const }] };
+    const onDay = applyTripEdit(trip, { type: 'savedToDay', dayNumber: 1, stop: stopFromBacklog(trip, 1, 'd', 'n1') });
+    expect(stopIds(onDay)).toEqual(['s1', 's2', 's3', 'n1']);
+    expect(onDay.savedPlaces[0].status).toBe('in_trip');
+    expect(applyTripEdit(onDay, { type: 'savedToBacklog', placeId: 'd' })).toBe(onDay);
+
+    const inBacklog = applyTripEdit(trip, { type: 'savedToBacklog', placeId: 'd' });
+    expect(inBacklog.backlog.at(-1)).toEqual({ placeId: 'd', reason: SAVED_LATER });
+    expect(inBacklog.savedPlaces[0].status).toBe('in_trip');
   });
 });

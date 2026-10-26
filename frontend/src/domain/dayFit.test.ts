@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { checkMoveToDay } from './moveToDay';
+import { checkMoveToDay, suggestDay } from './dayFit';
 import { stop, testTrip } from './testTrip';
 import type { Trip } from './types';
 
@@ -34,5 +34,24 @@ describe('checkMoveToDay across cities', () => {
     const kyoto = { ...trip.stays[0], id: 'kyoto', city: 'Kyoto' };
     const moved = { ...trip, stays: [...trip.stays, kyoto], days: trip.days.map((d) => (d.number === 2 ? { ...d, stayId: 'kyoto' } : d)) };
     expect(checkMoveToDay(moved, 1, 's2', 2)).toEqual({ fits: false, reason: 'This day is in Kyoto.' });
+  });
+});
+
+describe('suggestDay', () => {
+  it('picks a day in the same city where the place fits', () => {
+    // d fits on both days, which are equally near, so the first wins.
+    expect(suggestDay(twoDays([]), 'd')).toEqual({ dayNumber: 1 });
+    // With Day 1 ending at 10 AM it no longer fits there.
+    const trip = twoDays([]);
+    const short = { ...trip, days: trip.days.map((d) => (d.number === 1 ? { ...d, endMin: 600 } : d)) };
+    expect(suggestDay(short, 'd')).toEqual({ dayNumber: 2 });
+  });
+
+  it('says when no day is in its city, or no day has room', () => {
+    const trip = twoDays([]);
+    const elsewhere = { ...trip, places: { ...trip.places, d: { ...trip.places.d, city: 'Osaka' } } };
+    expect(suggestDay(elsewhere, 'd')).toEqual({ dayNumber: null, reason: 'No day in Osaka on this trip.' });
+    const full = { ...trip, days: trip.days.map((d) => ({ ...d, endMin: 600 })) };
+    expect(suggestDay(full, 'd')).toEqual({ dayNumber: null, reason: 'No day in City has room.' });
   });
 });

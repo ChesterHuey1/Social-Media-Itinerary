@@ -119,8 +119,9 @@ def test_unchecked_places_leave_the_trip_and_are_remembered(client: TestClient) 
     on_days = {s["placeId"] for d in t["days"] for s in d["stops"]}
     # teamLab is locked, so it stays; Itoya, Kagari, Senso-ji and Ueno Park aren't in the saved list, so they stay.
     assert on_days == {"tsukiji", "ichiran", "fushimi", "teamlab", "itoya", "kagari", "sensoji", "ueno"}
-    included = {sp["placeId"] for sp in t["savedPlaces"] if sp["included"]}
-    assert included == {"tsukiji", "ichiran", "fushimi"}
+    statuses = {sp["placeId"]: sp["status"] for sp in t["savedPlaces"]}
+    assert {p for p, s in statuses.items() if s == "in_trip"} == {"tsukiji", "ichiran", "fushimi"}
+    assert statuses["meiji"] == "dismissed"
 
 
 def test_undo_restores_every_day_and_the_backlog(client: TestClient) -> None:

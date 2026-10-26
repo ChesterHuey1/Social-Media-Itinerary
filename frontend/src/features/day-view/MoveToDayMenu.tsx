@@ -1,5 +1,5 @@
 import { formatDate } from '../../domain/format';
-import { checkMoveToDay } from '../../domain/moveToDay';
+import { checkMoveToDay } from '../../domain/dayFit';
 import { useTrip } from '../../state/tripContext';
 import { Button } from '../../ui/Button';
 import s from './DayView.module.css';

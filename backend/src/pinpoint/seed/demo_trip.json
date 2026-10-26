@@ -419,6 +419,34 @@
         "explore"
       ]
     },
+    "yanaka": {
+      "id": "yanaka",
+      "name": "Yanaka Ginza",
+      "area": "Yanaka",
+      "city": "Tokyo",
+      "location": {
+        "lat": 35.7277,
+        "lng": 139.766
+      },
+      "hours": {
+        "kind": "windows",
+        "source": "google",
+        "windows": [
+          {
+            "openMin": 600,
+            "closeMin": 1140
+          }
+        ]
+      },
+      "lastEntryMin": 0,
+      "cost": null,
+      "needsBooking": false,
+      "tip": null,
+      "objectives": [
+        "eat",
+        "explore"
+      ]
+    },
     "fushimi": {
       "id": "fushimi",
       "name": "Fushimi Inari Taisha",
@@ -1171,79 +1199,85 @@
       "placeId": "ichiran",
       "from": "reel",
       "reelCount": 1,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "teamlab",
       "from": "reel",
       "reelCount": 2,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "tsukiji",
       "from": "search",
       "reelCount": 0,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "shibuyaSky",
       "from": "reel",
       "reelCount": 1,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "nonbei",
       "from": "reel",
       "reelCount": 1,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "uobei",
       "from": "search",
       "reelCount": 0,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "goldenGai",
       "from": "reel",
       "reelCount": 1,
-      "included": false
+      "status": "dismissed"
     },
     {
       "placeId": "meiji",
       "from": "reel",
       "reelCount": 1,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "fushimi",
       "from": "reel",
       "reelCount": 1,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "nishiki",
       "from": "search",
       "reelCount": 0,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "kinkakuji",
       "from": "reel",
       "reelCount": 1,
-      "included": true
+      "status": "in_trip"
     },
     {
       "placeId": "dotonbori",
       "from": "reel",
       "reelCount": 1,
-      "included": false
+      "status": "new"
     },
     {
       "placeId": "gwangjang",
       "from": "reel",
       "reelCount": 1,
-      "included": false
+      "status": "new"
+    },
+    {
+      "placeId": "yanaka",
+      "from": "reel",
+      "reelCount": 1,
+      "status": "new"
     }
   ],
   "savedPosts": [

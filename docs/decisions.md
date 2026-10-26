@@ -32,6 +32,11 @@ The saved list is per user, and a place saved after a trip is built must still r
 
 `saved_post_places` links each post to the places found in it, so one restaurant saved from two Reels is one place with two posts.
 
+- `new` means saved since the last build. These show under New saves in the day view, each with "Add to Day N" or "Backlog".
+- Build itinerary marks checked places `in_trip` and unchecked ones `dismissed`, because you saw them and left them out.
+- "Add to Day N" suggests a day in the place's city where it fits at the end, nearest to that day's stops. It uses the same check as Move to Day. When no day works, only Backlog shows, with the reason.
+- Undo after a build puts the days and backlog back but not these statuses.
+
 ### Day timing and Optimize route
 
 The browser's timeline (`frontend/src/domain/timeline.ts`) and the optimizer (`backend/src/pinpoint/plan/optimize.py`) use the same arithmetic, so a plan the optimizer accepts never shows a warning:

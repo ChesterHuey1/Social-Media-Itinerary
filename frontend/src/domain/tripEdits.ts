@@ -12,12 +12,18 @@ export type TripEdit =
   | { type: 'moveToBacklog'; dayNumber: number; stopId: string }
   /** Moves a stop to the end of another day. Its locked time is cleared: it was a time on the old day. */
   | { type: 'moveToDay'; dayNumber: number; stopId: string; toDayNumber: number }
+  /** A place saved since the last build goes to the end of a day, or to the backlog. Either way it stops being new. */
+  | { type: 'savedToDay'; dayNumber: number; stop: Stop }
+  | { type: 'savedToBacklog'; placeId: string }
   | { type: 'addFromBacklog'; dayNumber: number; stop: Stop }
   /** Puts a day back to exactly these stops. Undo after Optimize route sends the day's previous stops. */
   | { type: 'replaceDayStops'; dayNumber: number; stops: Stop[] }
   /** Puts every day and the backlog back exactly. Undo after Build itinerary sends the plan from before. */
   | { type: 'restorePlan'; days: { dayNumber: number; stops: Stop[] }[]; backlog: BacklogItem[] };
 
+
+/** Same text as backend/src/pinpoint/trips/edits.py. */
+export const SAVED_LATER = 'Saved after the trip was built.';
 
 function updateDay(trip: Trip, dayNumber: number, change: (day: Day) => Day): Trip {
   return { ...trip, days: trip.days.map((d) => (d.number === dayNumber ? change(d) : d)) };
@@ -78,6 +84,19 @@ export function applyTripEdit(trip: Trip, edit: TripEdit): Trip {
         stops: day.stops.filter((s) => s.id !== edit.stopId),
       }));
       return updateDay(withoutStop, edit.toDayNumber, (day) => ({ ...day, stops: [...day.stops, { ...stop, lockedAtMin: null }] }));
+    }
+
+    case 'savedToDay':
+    case 'savedToBacklog': {
+      const placeId = edit.type === 'savedToDay' ? edit.stop.placeId : edit.placeId;
+      if (!trip.savedPlaces.some((sp) => sp.placeId === placeId && sp.status === 'new')) return trip;
+      if (edit.type === 'savedToDay' && !trip.days.some((d) => d.number === edit.dayNumber)) return trip;
+      const used = {
+        ...trip,
+        savedPlaces: trip.savedPlaces.map((sp) => (sp.placeId === placeId ? { ...sp, status: 'in_trip' as const } : sp)),
+      };
+      if (edit.type === 'savedToBacklog') return { ...used, backlog: [...trip.backlog, { placeId, reason: SAVED_LATER }] };
+      return updateDay(used, edit.dayNumber, (day) => ({ ...day, stops: [...day.stops, edit.stop] }));
     }
 
     case 'restorePlan': {

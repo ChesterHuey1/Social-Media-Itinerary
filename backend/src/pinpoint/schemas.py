@@ -188,7 +188,8 @@ class SavedPlace(Schema):
     # "from" again: where the place was saved from.
     from_: Literal["reel", "search"] = Field(alias="from")
     reel_count: int
-    included: bool
+    # new: saved since the last build. in_trip: on a day or in the backlog. dismissed: left out at a build.
+    status: Literal["new", "in_trip", "dismissed"]
 
 
 class SavedPost(Schema):
@@ -265,6 +266,21 @@ class MoveToDay(Schema):
     to_day_number: int
 
 
+class SavedToDay(Schema):
+    """Puts a new saved place at the end of a day."""
+
+    type: Literal["savedToDay"]
+    day_number: int
+    stop: Stop
+
+
+class SavedToBacklog(Schema):
+    """Puts a new saved place in the backlog."""
+
+    type: Literal["savedToBacklog"]
+    place_id: str
+
+
 class AddFromBacklog(Schema):
     type: Literal["addFromBacklog"]
     day_number: int
@@ -293,7 +309,16 @@ class RestorePlan(Schema):
 
 
 TripEdit = Annotated[
-    MoveStop | UpdateStop | AddComment | MoveToBacklog | MoveToDay | AddFromBacklog | ReplaceDayStops | RestorePlan,
+    MoveStop
+    | UpdateStop
+    | AddComment
+    | MoveToBacklog
+    | MoveToDay
+    | SavedToDay
+    | SavedToBacklog
+    | AddFromBacklog
+    | ReplaceDayStops
+    | RestorePlan,
     Field(discriminator="type"),
 ]
 

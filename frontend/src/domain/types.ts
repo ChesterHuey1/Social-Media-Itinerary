@@ -124,7 +124,8 @@ export type Expense = {
 /** What a new expense can be filed under. Flights and Stay come from their own rows. */
 export type SpendingCategory = Exclude<ExpenseCategory, 'flights' | 'stay'>;
 
-export type SavedPlace = { placeId: string; from: 'reel' | 'search'; reelCount: number; included: boolean };
+/** new: saved since the last build. in_trip: on a day or in the backlog. dismissed: left out at a build. */
+export type SavedPlace = { placeId: string; from: 'reel' | 'search'; reelCount: number; status: 'new' | 'in_trip' | 'dismissed' };
 
 export type SavedPost = { id: string; url: string; status: 'pending' | 'done' | 'needs_review' };
 

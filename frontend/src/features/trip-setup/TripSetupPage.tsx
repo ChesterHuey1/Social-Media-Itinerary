@@ -19,7 +19,7 @@ export function TripSetupPage() {
   const [building, setBuilding] = useState(false);
   const [buildFailed, setBuildFailed] = useState(false);
   const [included, setIncluded] = useState(
-    () => new Set(trip.savedPlaces.filter((sp) => sp.included).map((sp) => sp.placeId)),
+    () => new Set(trip.savedPlaces.filter((sp) => sp.status === 'in_trip').map((sp) => sp.placeId)),
   );
 
   const toggle = (placeId: string) =>

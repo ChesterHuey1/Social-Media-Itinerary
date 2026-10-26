@@ -8,6 +8,7 @@ import { useTrip } from '../../state/tripContext';
 import { cx } from '../../ui/cx';
 import { Icon } from '../../ui/Icon';
 import { Backlog } from './Backlog';
+import { NewSaves } from './NewSaves';
 import { DayBreakdown, DayHeader } from './DayHeader';
 import s from './DayView.module.css';
 import { EditStopPanel } from './EditStopPanel';
@@ -142,6 +143,7 @@ export function DayViewPage() {
         />
         <StopList day={day} timeline={timeline} onEditStop={setEditingStopId} />
         {summary.stopCount > 0 && <DayBreakdown summary={summary} />}
+        <NewSaves />
         <Backlog dayNumber={day.number} />
       </main>
 

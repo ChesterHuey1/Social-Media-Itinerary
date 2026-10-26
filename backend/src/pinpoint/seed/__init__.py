@@ -176,7 +176,7 @@ def seed_demo(session: Session) -> None:
                 place_id=sp.place_id,
                 source=sp.from_,
                 reel_count=sp.reel_count,
-                status="in_trip" if sp.included else "new",
+                status=sp.status,
             )
         )
     for post in trip.saved_posts:

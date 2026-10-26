@@ -168,9 +168,7 @@ def load_trip(session: Session, trip_id: str) -> schemas.Trip:
         ],
         places={p.id: _place(p) for p in places},
         saved_places=[
-            schemas.SavedPlace(
-                place_id=sp.place_id, from_=sp.source, reel_count=sp.reel_count, included=sp.status == "in_trip"
-            )
+            schemas.SavedPlace(place_id=sp.place_id, from_=sp.source, reel_count=sp.reel_count, status=sp.status)
             for sp in saved
         ],
         saved_posts=[schemas.SavedPost(id=p.id, url=p.url, status=p.status) for p in posts],
