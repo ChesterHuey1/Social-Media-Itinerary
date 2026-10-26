@@ -20,6 +20,9 @@ class Settings(BaseSettings):
     meta_app_secret: str = ""
     instagram_user_id: str = ""
 
+    # Named in the scraper's user agent so site owners can reach whoever runs it. Your choice to fill in.
+    scraper_contact: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:

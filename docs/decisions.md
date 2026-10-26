@@ -41,9 +41,15 @@ The saved list is per user, and a place saved after a trip is built must still r
 
 `flights` gains `buffer_min` (null uses the airport's value) and `big_luggage`. The arrival day starts when the picked transfer arrives at the hotel.
 
-### Place facts wait for Part 4
+### Place facts and the scraper
 
-For now `places` keeps cost and tip in its own columns, each with its source. The spec's `place_facts` table, one row per value with the page it came from, arrives in Part 4 with the fill-in pipeline that writes it.
+`places` keeps the value the app uses (hours, cost, tip), each with its source. `place_facts` keeps every value any source found, with the page and the line it came from, and `scraped_pages` keeps each fetched page's text, title and same-site links that looked like hours or price pages.
+
+The scraper (`uv run python -m pinpoint.enrich`) fetches a place's homepage and up to 2 same-site pages whose link text suggests hours, prices or booking. Until DeepSeek reads those pages, a pattern matcher stands in:
+
+- It fills **only gaps**, and only hours and last entry, which pass strict checks.
+- Booking and price lines are recorded with their evidence but not applied. On a page listing many bars or shops, a pattern can't tell whose rule a line describes.
+- When a site disagrees with a value we already have, the report flags it and nothing changes.
 
 ### Budget
 

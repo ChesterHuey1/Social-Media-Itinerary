@@ -75,7 +75,50 @@ class Place(Base):
     tip_text: Mapped[str | None]
     tip_source: Mapped[str | None]
     objectives: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+    website: Mapped[str | None]
     fetched_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class ScrapedPage(Base):
+    """One fetch of a place's own website. The text is kept so facts can be re-read without fetching again."""
+
+    __tablename__ = "scraped_pages"
+    __table_args__ = (
+        one_of("outcome", ("stored", "robots_disallowed", "blocked", "needs_javascript", "not_html", "error")),
+    )
+
+    url: Mapped[str] = mapped_column(String, primary_key=True)
+    place_id: Mapped[str] = mapped_column(ForeignKey("places.id", ondelete="CASCADE"))
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    http_status: Mapped[int | None]
+    outcome: Mapped[str]
+    title: Mapped[str | None]
+    # sha256 of the cleaned text, to tell whether the page changed since last time.
+    content_hash: Mapped[str | None] = mapped_column(String(64))
+    text: Mapped[str | None]
+    # Same-site links that looked like hours or price pages, followed on the next pass.
+    links: Mapped[list[str]] = mapped_column(ARRAY(String), default=list)
+
+
+class PlaceFact(Base):
+    """One value about a place and where it came from, so the UI can mark estimates."""
+
+    __tablename__ = "place_facts"
+    __table_args__ = (
+        UniqueConstraint("place_id", "field", "source"),
+        one_of("field", ("hours", "last_entry", "cost", "booking")),
+        one_of("source", FACT_SOURCES),
+    )
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    place_id: Mapped[str] = mapped_column(ForeignKey("places.id", ondelete="CASCADE"))
+    field: Mapped[str]
+    value: Mapped[dict[str, Any]] = mapped_column(JSONB)
+    source: Mapped[str]
+    page_url: Mapped[str | None]
+    # The sentence the value was read from, so a person can check it.
+    evidence: Mapped[str | None]
+    fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class Trip(Base):
