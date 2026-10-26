@@ -1,0 +1,77 @@
+/* Design tokens from the UI specification. Components use these, never raw values. */
+:root {
+  /* 60% */
+  --stone: #eae7dc;
+  --stone-dark: #dfdacb;
+  /* 30% */
+  --paper: #f7f5ef;
+  --white: #ffffff;
+  --ink: #22201c;
+  --muted: #5e584f;
+  --line: #d3cdbf;
+  /* 10% */
+  --orange: #c2410c;
+  --orange-hover: #a9380a;
+  --orange-soft: #f6dccb;
+  --orange-text: #9a3412;
+
+  /* Stop colors and their tag tints */
+  --slate: #3e4c8a;
+  --slate-tint: #dfe2f0;
+  --moss: #3f6b4a;
+  --moss-tint: #dce6de;
+  --moss-text: #2f5239;
+  --neutral-tint: #e3ded1;
+  --dash: #b9b1a2;
+  --map-land: #ece8dd;
+
+  /* Spacing scale: only these nine values */
+  --s4: 4px;
+  --s8: 8px;
+  --s12: 12px;
+  --s16: 16px;
+  --s20: 20px;
+  --s24: 24px;
+  --s32: 32px;
+  --s48: 48px;
+  --s64: 64px;
+
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-body: 'Figtree', system-ui, sans-serif;
+
+  --ease: 150ms ease-out;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--stone);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--orange-soft), inset 0 0 0 1.5px var(--orange);
+}

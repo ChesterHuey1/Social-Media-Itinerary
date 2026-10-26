@@ -1,0 +1,50 @@
+import { describe, expect, it } from 'vitest';
+import { testTrip, stop } from './testTrip';
+import { applyTripEdit } from './tripEdits';
+
+const base = () => testTrip([stop('s1', 'a', 60), stop('s2', 'b', 30), stop('s3', 'c', 45)]);
+const stopIds = (trip: ReturnType<typeof base>) => trip.days[0].stops.map((s) => s.id);
+
+describe('applyTripEdit', () => {
+  it('moves a stop to a new position', () => {
+    expect(stopIds(applyTripEdit(base(), { type: 'moveStop', dayNumber: 1, fromIndex: 0, toIndex: 2 }))).toEqual(['s2', 's3', 's1']);
+  });
+
+  it('ignores a move past either end', () => {
+    const trip = base();
+    expect(applyTripEdit(trip, { type: 'moveStop', dayNumber: 1, fromIndex: 2, toIndex: 3 })).toBe(trip);
+  });
+
+  it('applies only the changed fields of a stop', () => {
+    const next = applyTripEdit(base(), {
+      type: 'updateStop',
+      dayNumber: 1,
+      stopId: 's2',
+      changes: { title: 'Lunch', stay: { minutes: 90, source: 'user' } },
+    });
+    expect(next.days[0].stops[1]).toMatchObject({ title: 'Lunch', color: 'orange', stay: { minutes: 90, source: 'user' } });
+  });
+
+  it('adds a trimmed comment and drops an empty one', () => {
+    const add = (body: string) =>
+      applyTripEdit(base(), { type: 'addComment', dayNumber: 1, stopId: 's1', commentId: 'c', body, createdAt: '2026-01-01' });
+    expect(add('  Bring cash ').days[0].stops[0].comments).toEqual([{ id: 'c', body: 'Bring cash', createdAt: '2026-01-01' }]);
+    expect(add('   ').days[0].stops[0].comments).toEqual([]);
+  });
+
+  it('moves a stop to the backlog with a reason, and back onto a day', () => {
+    const removed = applyTripEdit(base(), { type: 'moveToBacklog', dayNumber: 1, stopId: 's2' });
+    expect(stopIds(removed)).toEqual(['s1', 's3']);
+    expect(removed.backlog[0]).toEqual({ placeId: 'b', reason: 'Moved here from Day 1.' });
+
+    const restored = applyTripEdit(removed, { type: 'addFromBacklog', dayNumber: 1, placeId: 'b', stopId: 'new' });
+    expect(stopIds(restored)).toEqual(['s1', 's3', 'new']);
+    expect(restored.backlog.map((b) => b.placeId)).toEqual(['d']);
+    expect(restored.days[0].stops[2]).toMatchObject({ placeId: 'b', stay: { minutes: 90, source: 'estimate' } });
+  });
+
+  it('refuses to add a place that is not in the backlog', () => {
+    const trip = base();
+    expect(applyTripEdit(trip, { type: 'addFromBacklog', dayNumber: 1, placeId: 'a', stopId: 'x' })).toBe(trip);
+  });
+});

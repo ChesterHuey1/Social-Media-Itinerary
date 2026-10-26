@@ -1,0 +1,924 @@
+/* Layout: sidebar 20%, center 45%, map 35% at 1280 px and up.
+   Shapes follow Wanderlog: flat rows on one sheet, pill buttons, no boxed cards. */
+.page {
+  display: grid;
+  grid-template-columns: minmax(264px, 20fr) minmax(520px, 45fr) minmax(400px, 35fr);
+  min-height: 100vh;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+  background: var(--stone-dark);
+  padding: var(--s24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s32);
+  min-width: 0;
+}
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+}
+.tripName {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 36px;
+  line-height: 1.05;
+}
+.meta {
+  font-size: 14px;
+  color: var(--muted);
+}
+.stay {
+  display: flex;
+  gap: var(--s8);
+  align-items: center;
+  font-size: 14px;
+}
+.editTrip {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+}
+.editTrip:hover {
+  text-decoration: underline;
+}
+.days {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+.dayRow {
+  height: 48px;
+  padding: 0 var(--s16);
+  border-radius: 999px;
+  color: var(--ink);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s8);
+  transition: background var(--ease);
+}
+.dayRow:hover {
+  background: var(--paper);
+}
+.dayRowActive,
+.dayRowActive:hover {
+  background: var(--orange);
+  color: var(--white);
+}
+.dayRowText {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s8);
+  min-width: 0;
+}
+.dayName {
+  font-weight: 600;
+}
+.dayDate {
+  font-size: 14px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.dayCount {
+  font-size: 14px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.dayRowActive .dayDate,
+.dayRowActive .dayCount {
+  color: var(--white);
+}
+.backlogRow {
+  font-weight: 600;
+}
+.pill {
+  min-width: 28px;
+  height: 24px;
+  padding: 0 var(--s8);
+  border-radius: 999px;
+  background: var(--paper);
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.budget {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s12);
+}
+.budgetFigure {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--s8);
+}
+.budgetNumber {
+  font-family: var(--font-display);
+  font-size: 40px;
+  line-height: 1;
+}
+.bar {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--line);
+  overflow: hidden;
+}
+.barFill {
+  height: 100%;
+  background: var(--orange);
+}
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+  font-size: 14px;
+}
+.category {
+  display: flex;
+  justify-content: space-between;
+}
+.category span:first-child {
+  color: var(--muted);
+}
+
+/* ---------- Mobile view tabs (hidden on desktop) ---------- */
+.viewTabs {
+  display: none;
+  gap: var(--s8);
+  padding: var(--s16) var(--s16) 0;
+}
+.viewTab {
+  flex: 1;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--white);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.viewTabActive {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--white);
+}
+
+/* ---------- Center column: one paper sheet ---------- */
+.center {
+  background: var(--paper);
+  padding: var(--s32);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s24);
+  min-width: 0;
+}
+.banner {
+  background: var(--orange-soft);
+  color: var(--orange-text);
+  border-radius: 16px;
+  padding: var(--s12) var(--s16);
+  display: flex;
+  align-items: center;
+  gap: var(--s12);
+}
+.banner > span {
+  flex: 1;
+}
+.bannerLink {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  font-weight: 600;
+  color: var(--orange-text);
+}
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s16);
+}
+.titleBlock {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+  min-width: 0;
+}
+.dayKicker {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--muted);
+}
+.dayTitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 48px;
+  line-height: 1.05;
+}
+.dayTotal {
+  font-size: 15px;
+  color: var(--muted);
+}
+.dayTotal strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s8);
+}
+.showMap {
+  display: none;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+}
+.row {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  column-gap: var(--s16);
+  align-items: start;
+}
+.rowCenter {
+  align-items: center;
+}
+.time {
+  font-size: 14px;
+  font-weight: 600;
+  padding-top: 4px;
+}
+.rowCenter .time {
+  padding-top: 0;
+}
+.fixedRow {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  gap: var(--s12);
+  font-weight: 600;
+}
+.hBadge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.ellipsis {
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Travel leg: tiny text centered on a dashed line, Wanderlog style. */
+.leg {
+  display: flex;
+  align-items: center;
+  gap: var(--s8);
+  padding: var(--s4) 0;
+  font-size: 13px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+.leg::before,
+.leg::after {
+  content: '';
+  flex: 1;
+  border-top: 1.5px dashed var(--line);
+}
+.leg::before {
+  flex: 0 0 72px;
+}
+
+/* A stop is a flat row, not a boxed card. */
+.stop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+  padding: var(--s4) 0;
+  border-radius: 12px;
+  background: var(--paper);
+}
+.stopHead {
+  display: flex;
+  align-items: center;
+  gap: var(--s12);
+}
+.handle {
+  width: 24px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+}
+.handle:active {
+  cursor: grabbing;
+}
+.badge {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: var(--white);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+.stopName {
+  flex: 1;
+  min-width: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.range {
+  font-size: 14px;
+  color: var(--muted);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s4);
+}
+.iconActions {
+  display: flex;
+  gap: var(--s4);
+}
+.iconButton {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background var(--ease), color var(--ease);
+}
+.iconButton:hover {
+  background: var(--neutral-tint);
+  color: var(--ink);
+}
+.iconButtonOn {
+  color: var(--ink);
+}
+.iconButtonAccent:hover {
+  background: var(--orange-soft);
+  color: var(--orange-text);
+}
+/* 64 px = handle 24 + gap 12 + badge 28, so the body lines up under the name. */
+.stopBody {
+  padding-left: 64px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s8);
+}
+.details {
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s4) var(--s24);
+  font-size: 14px;
+}
+.details div {
+  display: flex;
+  gap: var(--s8);
+}
+.details dt {
+  font-weight: 600;
+}
+.details dd {
+  margin: 0;
+}
+.alert {
+  background: var(--orange-soft);
+  color: var(--orange-text);
+  border-radius: 16px;
+  padding: var(--s8) var(--s8) var(--s8) var(--s16);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s12);
+}
+.alert > span {
+  flex: 1;
+  min-width: 180px;
+}
+.comment {
+  background: var(--stone);
+  border-radius: 12px;
+  padding: var(--s8) var(--s12);
+  font-size: 14px;
+}
+.commentWho {
+  font-weight: 600;
+  margin-right: var(--s8);
+}
+
+/* A dragged stop lifts; the others slide aside (dnd-kit transition, 200 ms). */
+.sortable {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+}
+.lifted {
+  z-index: 2;
+}
+.lifted .stop {
+  box-shadow: 0 2px 8px rgba(34, 32, 28, 0.18);
+}
+/* Legs describe the old order while a stop is dragged. Hide them without changing the layout,
+   so the positions dnd-kit measured at drag start stay true. */
+.dragging .leg {
+  visibility: hidden;
+}
+
+.dayAlert {
+  list-style: none;
+}
+.openTime,
+.empty {
+  background: var(--stone);
+  border-radius: 16px;
+  padding: var(--s16) var(--s20);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s12);
+}
+.empty {
+  list-style: none;
+  flex-direction: column;
+  padding: var(--s48) var(--s24);
+  text-align: center;
+}
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 600;
+}
+.picker {
+  flex-basis: 100%;
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.pickerRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s16);
+  border-top: 1px solid var(--line);
+}
+.small {
+  font-size: 14px;
+  color: var(--muted);
+}
+.strong {
+  font-weight: 600;
+}
+
+/* ---------- Day breakdown, after the last stop ---------- */
+.breakdown {
+  border-top: 1px solid var(--line);
+  padding-top: var(--s24);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s12);
+}
+.breakdownTitle,
+.sectionTitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1.1;
+}
+.breakdownList {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+.breakdownRow {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s16);
+  padding: var(--s8) 0;
+  border-bottom: 1px solid var(--line);
+}
+.breakdownRow dt {
+  color: var(--muted);
+}
+.breakdownRow dd {
+  margin: 0;
+  text-align: right;
+}
+.breakdownTotal {
+  border-bottom: 0;
+  font-weight: 600;
+  font-size: 18px;
+}
+.breakdownTotal dt {
+  color: var(--ink);
+}
+
+/* ---------- Backlog: flat rows ---------- */
+.section {
+  border-top: 1px solid var(--line);
+  padding: var(--s24) 0 var(--s48);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s12);
+}
+.sectionHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--s16);
+}
+.backlogList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.backlogRow2 {
+  display: flex;
+  align-items: center;
+  gap: var(--s16);
+  padding: var(--s12) 0;
+  border-bottom: 1px solid var(--line);
+}
+.backlogText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+
+/* ---------- Map ---------- */
+.map {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  min-height: 640px;
+  overflow: hidden;
+  background: var(--map-land);
+}
+.mapSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.legend {
+  position: absolute;
+  left: var(--s24);
+  top: var(--s24);
+  background: var(--paper);
+  border-radius: 16px;
+  padding: var(--s12) var(--s16);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+  font-size: 13px;
+}
+.legendRow {
+  display: flex;
+  align-items: center;
+  gap: var(--s8);
+}
+.mapControls {
+  position: absolute;
+  right: var(--s24);
+  top: var(--s24);
+  display: flex;
+  gap: var(--s8);
+  align-items: flex-start;
+}
+.zoom {
+  display: flex;
+  flex-direction: column;
+  background: var(--paper);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.zoomBtn {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.zoomBtn:hover {
+  background: var(--white);
+}
+.zoomDivider {
+  height: 1px;
+  margin: 0 var(--s8);
+  background: var(--line);
+}
+.closeMap {
+  display: none;
+}
+.routeCheck {
+  position: absolute;
+  left: var(--s24);
+  right: var(--s24);
+  bottom: var(--s24);
+  background: var(--paper);
+  border-radius: 16px;
+  padding: var(--s4) var(--s16);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s8) var(--s16);
+  font-size: 14px;
+}
+.ok {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s8);
+  color: var(--moss-text);
+}
+.warn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s8);
+  color: var(--orange-text);
+  font-weight: 600;
+}
+.mapsLink {
+  margin-left: auto;
+}
+
+/* ---------- Side panel: covers the map column exactly ---------- */
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 35%;
+  min-width: 400px;
+  z-index: 20;
+  background: var(--paper);
+  border-radius: 24px 0 0 24px;
+  box-shadow: -4px 0 24px rgba(34, 32, 28, 0.12);
+  display: flex;
+  flex-direction: column;
+  animation: slideIn 200ms ease-out;
+}
+.panelForm {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.panelBody {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: var(--s32);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s24);
+}
+.panelHead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--s16);
+}
+.panelTitle {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 32px;
+  line-height: 1.1;
+}
+.fieldset {
+  border: 0;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+}
+.legendText {
+  padding: 0;
+  margin-bottom: var(--s8);
+  font-size: 14px;
+  font-weight: 600;
+}
+.swatches {
+  display: flex;
+  gap: var(--s8);
+}
+.swatch {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 50%;
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.swatchOn {
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink);
+}
+.inline {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--s8);
+}
+.numberField {
+  width: 96px;
+}
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: var(--s12);
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.checkbox {
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  accent-color: var(--ink);
+}
+.divider {
+  height: 1px;
+  background: var(--line);
+}
+.panelFoot {
+  padding: var(--s20) var(--s32) var(--s32);
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s16);
+}
+.panelFootRight {
+  display: flex;
+  align-items: center;
+  gap: var(--s16);
+}
+
+/* ---------- 1024 to 1279 px: map becomes a 50% overlay ---------- */
+@media (max-width: 1279px) {
+  .page {
+    grid-template-columns: minmax(0, 24fr) minmax(0, 76fr);
+  }
+  .map {
+    display: none;
+  }
+  .showMap {
+    display: inline-flex;
+  }
+  .page[data-map-open='true'] .map {
+    display: block;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 50%;
+    height: 100vh;
+    z-index: 10;
+  }
+  .page[data-map-open='true'] .closeMap {
+    display: inline-flex;
+  }
+  .panel {
+    width: min(100%, 480px);
+    min-width: 0;
+  }
+}
+
+/* ---------- Under 1024 px: day tabs on top, List / Map / Budget tabs ---------- */
+@media (max-width: 1023px) {
+  .page {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .viewTabs {
+    display: flex;
+  }
+  .sidebar {
+    padding: var(--s16);
+    gap: var(--s16);
+  }
+  .tripGroup,
+  .daysLabel {
+    display: none;
+  }
+  .days {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  .dayRow {
+    flex: none;
+  }
+  .dayDate,
+  .dayCount {
+    display: none;
+  }
+  .budgetGroup {
+    display: none;
+  }
+  .page[data-tab='budget'] .budgetGroup {
+    display: flex;
+  }
+  .page[data-tab='budget'] .center,
+  .page[data-tab='map'] .center {
+    display: none;
+  }
+  .page[data-tab='map'] .map {
+    display: block;
+    position: relative;
+    width: auto;
+    height: 75vh;
+  }
+  .showMap,
+  .page[data-map-open='true'] .closeMap {
+    display: none;
+  }
+  .center {
+    padding: var(--s16);
+  }
+  .dayTitle {
+    font-size: 36px;
+  }
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: var(--s4);
+  }
+  .time {
+    padding-top: 0;
+  }
+  .stopBody {
+    padding-left: 0;
+  }
+  .leg::before {
+    flex: 0 0 16px;
+  }
+  .panel {
+    width: 100%;
+    border-radius: 0;
+  }
+}
