@@ -330,6 +330,8 @@ class DroppedStop(Schema):
 
 class BuildRequest(Schema):
     included_place_ids: list[str]
+    # A plan from /build/preview to save exactly as shown. Without one, the build runs again.
+    plan: "PlanSnapshot | None" = None
 
 
 class PlanSnapshot(Schema):

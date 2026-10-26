@@ -6,35 +6,52 @@ import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
 import { TextField } from '../../ui/Field';
 import ui from '../../ui/ui.module.css';
-import type { BuiltState } from '../../state/api';
+import { planOf, type BuildResult, type BuiltState } from '../../state/api';
 import { useTrip } from '../../state/tripContext';
 import { BookingsSection } from './BookingsSection';
+import { RebuildPreview } from './RebuildPreview';
 import { SavedPlacesSection } from './SavedPlacesSection';
 import s from './TripSetup.module.css';
 import { useSave } from './useSave';
 
 export function TripSetupPage() {
-  const { trip, build } = useTrip();
+  const { trip, build, preview } = useTrip();
   const navigate = useNavigate();
   const [building, setBuilding] = useState(false);
   const [buildFailed, setBuildFailed] = useState(false);
+  // A rebuild shows what would change first; Apply saves exactly that plan.
+  const [previewed, setPreviewed] = useState<BuildResult | null>(null);
+  const rebuilding = trip.days.some((d) => d.stops.length > 0);
   const [included, setIncluded] = useState(
     () => new Set(trip.savedPlaces.filter((sp) => sp.status === 'in_trip').map((sp) => sp.placeId)),
   );
 
-  const toggle = (placeId: string) =>
+  const toggle = (placeId: string) => {
     setIncluded((current) => {
       const next = new Set(current);
       if (next.has(placeId)) next.delete(placeId);
       else next.add(placeId);
       return next;
     });
+    setPreviewed(null);
+  };
+
+  const showPreview = async () => {
+    setBuilding(true);
+    setBuildFailed(false);
+    try {
+      setPreviewed(await preview([...included]));
+    } catch {
+      setBuildFailed(true);
+    }
+    setBuilding(false);
+  };
 
   const buildTrip = async () => {
     setBuilding(true);
     setBuildFailed(false);
     try {
-      const result = await build([...included]);
+      const result = await build([...included], previewed ? planOf(previewed.trip) : undefined);
       const built: BuiltState = { placed: result.placed, backlogged: result.backlogged.length, previous: result.previous, at: Date.now() };
       navigate('/trip/day/1', { state: { built } });
     } catch {
@@ -58,6 +75,7 @@ export function TripSetupPage() {
         <TripDetailsSection trip={trip} />
         <DayHoursSection trip={trip} />
         <SavedPlacesSection trip={trip} included={included} onToggle={toggle} />
+        {previewed && <RebuildPreview before={trip} after={previewed.trip} />}
 
         <footer className={s.footer}>
           <span className={s.muted}>
@@ -68,9 +86,26 @@ export function TripSetupPage() {
               Couldn't build the itinerary. Check that the backend is running, then try again.
             </span>
           )}
-          <Button variant="primary" tall icon="arrowRight" onClick={buildTrip} disabled={building || included.size === 0}>
-            {building ? 'Building your trip…' : 'Build itinerary'}
-          </Button>
+          {previewed ? (
+            <span className={s.footerActions}>
+              <Button tall onClick={() => setPreviewed(null)} disabled={building}>
+                Cancel
+              </Button>
+              <Button variant="primary" tall icon="arrowRight" onClick={buildTrip} disabled={building}>
+                {building ? 'Saving…' : 'Apply changes'}
+              </Button>
+            </span>
+          ) : (
+            <Button
+              variant="primary"
+              tall
+              icon="arrowRight"
+              onClick={rebuilding ? showPreview : buildTrip}
+              disabled={building || included.size === 0}
+            >
+              {building ? (rebuilding ? 'Working it out…' : 'Building your trip…') : rebuilding ? 'Rebuild itinerary' : 'Build itinerary'}
+            </Button>
+          )}
         </footer>
       </main>
     </div>

@@ -5,6 +5,7 @@ import type { Trip } from '../domain/types';
 import {
   addExpense as saveExpense,
   buildItinerary,
+  previewBuild,
   deleteExpense,
   fetchTrip,
   loadTrip,
@@ -15,6 +16,7 @@ import {
   type BuildResult,
   type NewExpense,
   type OptimizeResult,
+  type PlanSnapshot,
   type SetupChange,
 } from './api';
 import { TripContext } from './tripContext';
@@ -68,17 +70,23 @@ export function TripProvider({ children }: { children: ReactNode }) {
       });
     });
 
-  const build = (includedPlaceIds: string[]) =>
+  const build = (includedPlaceIds: string[], plan?: PlanSnapshot) =>
     new Promise<BuildResult>((resolve, reject) => {
       queue.current = queue.current.then(async () => {
         try {
-          const result = await buildItinerary(TRIP_ID, includedPlaceIds);
+          const result = await buildItinerary(TRIP_ID, includedPlaceIds, plan);
           setTrip(result.trip);
           resolve(result);
         } catch (error) {
           reject(error);
         }
       });
+    });
+
+  /** After pending saves, so it previews the trip as it is now. Changes nothing. */
+  const preview = (includedPlaceIds: string[]) =>
+    new Promise<BuildResult>((resolve, reject) => {
+      queue.current = queue.current.then(() => previewBuild(TRIP_ID, includedPlaceIds).then(resolve, reject));
     });
 
   /** Runs a server call that returns the stored trip, after pending saves, and shows that trip. */
@@ -99,7 +107,7 @@ export function TripProvider({ children }: { children: ReactNode }) {
   const setup = (change: SetupChange) => save(() => saveSetup(TRIP_ID, change));
 
   return (
-    <TripContext value={{ trip, edit, optimize, build, addExpense, removeExpense, setup, saveError }}>
+    <TripContext value={{ trip, edit, optimize, build, preview, addExpense, removeExpense, setup, saveError }}>
       {children}
     </TripContext>
   );

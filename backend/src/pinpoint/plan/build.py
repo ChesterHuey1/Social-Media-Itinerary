@@ -172,3 +172,28 @@ def assign_days(places: list[PlaceToPlan], days: list[DayToFill]) -> Assignment:
         for number, group in planned.items():
             result[number].extend(p.id for p in group)
     return Assignment(result, unplaced)
+
+
+def add_to_days(places: list[PlaceToPlan], days: list[DayToFill], kept: dict[int, list[PlaceToPlan]]) -> Assignment:
+    """Rebuild: days keep the places already on them (`kept`), and each new place goes to the day in its city
+    where it can be visited and there is room, nearest to that day's places. `Assignment.days` lists only the
+    new places. `available_min` is the whole day; the kept places' time counts against it."""
+    result: dict[int, list[str]] = {d.number: [] for d in days}
+    unplaced: dict[str, str] = {}
+    planned = {d.number: list(kept.get(d.number, [])) for d in days}
+    budget = {d.number: d.available_min * DAY_FILL for d in days}
+    for place in places:
+        city_days = [d for d in days if d.city == place.city and d.available_min > 0]
+        options = [d for d in city_days if can_visit(place, d)]
+        roomy = [d for d in options if _cost(planned[d.number]) + _cost([place]) <= budget[d.number]]
+        if not city_days:
+            unplaced[place.id] = f"No day in {place.city} on this trip."
+        elif not options:
+            unplaced[place.id] = f"Not open during your day hours in {place.city}."
+        elif not roomy:
+            unplaced[place.id] = f"No day in {place.city} has room."
+        else:
+            day = _nearest_day(place, roomy, planned, place.lat)
+            planned[day.number].append(place)
+            result[day.number].append(place.id)
+    return Assignment(result, unplaced)

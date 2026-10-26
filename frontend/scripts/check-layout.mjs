@@ -17,8 +17,8 @@ const WIDTHS = [
   { name: 'phone', width: 390, height: 844 },
 ];
 // '#signed-out' answers the session check with 401, so the sign-in screen shows.
-// '#add-expense' opens the expense form in the budget panel; '#add-flight' opens the flight form.
-const PAGES = ['/trip/day/1', '/trip/day/1#add-expense', '/trip/day/2', '/trip/day/4', '/setup', '/setup#add-flight', '/setup#signed-out'];
+// '#add-expense' opens the expense form in the budget panel; '#add-flight' opens the flight form; '#rebuild' opens the rebuild preview.
+const PAGES = ['/trip/day/1', '/trip/day/1#add-expense', '/trip/day/2', '/trip/day/4', '/setup', '/setup#add-flight', '/setup#rebuild', '/setup#signed-out'];
 const TOLERANCE_PX = 1;
 // The API is answered with the backend's seed file, so this test needs no database.
 const SEED = JSON.parse(readFileSync(new URL('../../backend/src/pinpoint/seed/demo_trip.json', import.meta.url), 'utf8'));
@@ -34,6 +34,9 @@ try {
     const page = await browser.newPage({ viewport: { width: size.width, height: size.height } });
     await page.route('**/api/trips/demo', (route) => route.fulfill({ json: SEED }));
     await page.route('**/api/fx?*', (route) => route.fulfill({ json: { currency: 'JPY', usdPerUnit: 0.0063774, rateDate: '2026-10-23' } }));
+    // A preview that moves Meiji Jingu from the backlog to Day 1, so the change list shows.
+    const rebuilt = { ...SEED, backlog: SEED.backlog.filter((b) => b.placeId !== 'meiji'), days: SEED.days.map((d) => (d.number === 1 ? { ...d, stops: [...d.stops, { ...d.stops[0], id: 'm', placeId: 'meiji' }] } : d)) };
+    await page.route('**/api/trips/demo/build/preview', (route) => route.fulfill({ json: { trip: rebuilt, previous: { days: [], backlog: [] }, placed: 0, backlogged: [] } }));
     await page.route('**/api/auth/me', (route) => route.fulfill({ status: page.url().includes('#signed-out') ? 401 : 204 }));
     for (const path of PAGES) {
       await page.goto(base + path, { waitUntil: 'networkidle' });
@@ -46,6 +49,10 @@ try {
         await page.getByText('at the Oct 23 rate').waitFor();
       }
       if (path.endsWith('#add-flight')) await page.getByRole('button', { name: 'Add a flight' }).click();
+      if (path.endsWith('#rebuild')) {
+        await page.getByRole('button', { name: 'Rebuild itinerary' }).click();
+        await page.getByRole('region', { name: /Rebuilding changes/ }).waitFor();
+      }
       const where = `${size.name} ${path}`;
 
       const offScale = await page.evaluate((scale) => {

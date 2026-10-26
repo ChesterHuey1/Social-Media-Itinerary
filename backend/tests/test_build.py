@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi.testclient import TestClient
 
-from pinpoint.plan.build import DayToFill, PlaceToPlan, assign_days
+from pinpoint.plan.build import DayToFill, PlaceToPlan, add_to_days, assign_days
 from pinpoint.plan.defaults import STOP_COLOR_CYCLE, default_stay_minutes
 
 # ---------- Sorting places into days, on its own ----------
@@ -118,9 +118,13 @@ def test_unchecked_places_leave_the_trip_and_are_remembered(client: TestClient) 
     t = build(client, ["tsukiji", "ichiran", "fushimi"])["trip"]
     on_days = {s["placeId"] for d in t["days"] for s in d["stops"]}
     # teamLab is locked, so it stays; Itoya, Kagari, Senso-ji and Ueno Park aren't in the saved list, so they stay.
-    assert on_days == {"tsukiji", "ichiran", "fushimi", "teamlab", "itoya", "kagari", "sensoji", "ueno"}
+    # Kappabashi and Omoide Yokocho were in the backlog without a checkbox, so the rebuild places them.
+    assert on_days == {
+        "tsukiji", "ichiran", "fushimi", "teamlab", "itoya", "kagari", "sensoji", "ueno", "kappabashi", "omoide",
+    }  # fmt: skip
     statuses = {sp["placeId"]: sp["status"] for sp in t["savedPlaces"]}
-    assert {p for p, s in statuses.items() if s == "in_trip"} == {"tsukiji", "ichiran", "fushimi"}
+    # teamLab is locked, so it stays on the trip and the saved list says so.
+    assert {p for p, s in statuses.items() if s == "in_trip"} == {"tsukiji", "ichiran", "fushimi", "teamlab"}
     assert statuses["meiji"] == "dismissed"
 
 
@@ -135,3 +139,45 @@ def test_undo_restores_every_day_and_the_backlog(client: TestClient) -> None:
     after = response.json()
     assert after["days"] == before["days"]
     assert after["backlog"] == before["backlog"]
+
+
+def test_rebuild_keeps_every_stop_on_its_day_and_adds_backlog_places(client: TestClient) -> None:
+    before = trip(client)
+    days_before = {d["number"]: [s["placeId"] for s in d["stops"]] for d in before["days"]}
+    result = build(client, everything_saved(client))
+    after = result["trip"]
+    for d in after["days"]:
+        places = [s["placeId"] for s in d["stops"]]
+        # Every stop that was on this day still is (the optimizer may order the day again).
+        assert set(days_before[d["number"]]) - {b["placeId"] for b in after["backlog"]} <= set(places)
+    # Kappabashi (Asakusa) was in the backlog with no checkbox. It joins the Asakusa and Ueno day.
+    assert "kappabashi" in [s["placeId"] for s in after["days"][2]["stops"]]
+
+
+def test_add_to_days_picks_the_nearest_day_with_room() -> None:
+    near_a = PlaceToPlan("near-a", "Tokyo", 35.0, 139.001, 60)
+    a = PlaceToPlan("a", "Tokyo", 35.0, 139.0, 60)
+    b = PlaceToPlan("b", "Tokyo", 35.5, 139.5, 60)
+    days = [DayToFill(1, "Tokyo", 600), DayToFill(2, "Tokyo", 600), DayToFill(3, "Osaka", 600)]
+    assert add_to_days([near_a], days, {1: [b], 2: [a]}).days == {1: [], 2: ["near-a"], 3: []}
+    # Day 2 is full, so it goes to day 1.
+    full = {1: [b], 2: [a] + [PlaceToPlan(f"x{i}", "Tokyo", 35.0, 139.0, 120) for i in range(3)]}
+    assert add_to_days([near_a], days, full).days[1] == ["near-a"]
+    nowhere = add_to_days([PlaceToPlan("k", "Kyoto", 35, 135, 60)], days, {})
+    assert nowhere.unplaced == {"k": "No day in Kyoto on this trip."}
+
+
+def test_preview_saves_nothing_and_saving_it_gives_exactly_that_plan(client: TestClient) -> None:
+    before = trip(client)
+    request = {"includedPlaceIds": everything_saved(client)}
+    preview = client.post("/api/trips/demo/build/preview", json=request).json()
+    assert trip(client) == before
+    plan = {
+        "days": [{"dayNumber": d["number"], "stops": d["stops"]} for d in preview["trip"]["days"]],
+        "backlog": preview["trip"]["backlog"],
+    }
+    saved = client.post("/api/trips/demo/build", json={**request, "plan": plan}).json()
+    assert saved["trip"]["days"] == preview["trip"]["days"]
+    assert saved["trip"]["backlog"] == preview["trip"]["backlog"]
+    assert saved["trip"]["savedPlaces"] == preview["trip"]["savedPlaces"]
+    assert saved["previous"]["backlog"] == before["backlog"]

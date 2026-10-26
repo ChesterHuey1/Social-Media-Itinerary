@@ -59,8 +59,18 @@ export function optimizeDay(id: string, dayNumber: number): Promise<OptimizeResu
 }
 
 /** Puts the chosen saved places onto days by city and area, then plans each day. */
-export function buildItinerary(id: string, includedPlaceIds: string[]): Promise<BuildResult> {
-  return request<BuildResult>('/api/trips/' + id + '/build', { method: 'POST', body: JSON.stringify({ includedPlaceIds }) });
+export function buildItinerary(id: string, includedPlaceIds: string[], plan?: PlanSnapshot): Promise<BuildResult> {
+  return request<BuildResult>('/api/trips/' + id + '/build', { method: 'POST', body: JSON.stringify({ includedPlaceIds, plan }) });
+}
+
+/** What Build itinerary would do, without saving anything. Pass its plan to buildItinerary to save exactly that. */
+export function previewBuild(id: string, includedPlaceIds: string[]): Promise<BuildResult> {
+  return request<BuildResult>('/api/trips/' + id + '/build/preview', { method: 'POST', body: JSON.stringify({ includedPlaceIds }) });
+}
+
+/** The days and backlog of a trip, as buildItinerary takes a previewed plan. */
+export function planOf(trip: Trip): PlanSnapshot {
+  return { days: trip.days.map((d) => ({ dayNumber: d.number, stops: d.stops })), backlog: trip.backlog };
 }
 
 export type NewExpense = { amount: number; currency: string; category: SpendingCategory; note: string; date: string };

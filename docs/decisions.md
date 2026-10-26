@@ -146,6 +146,14 @@ The spec says one account, a password hash in `.env`, a session cookie and HTTPS
 | Dragging is hard on a phone | The up and down arrows stay visible on every card. |
 | "Name it" for an unmatched post leads nowhere | A panel shows the post's image and caption with a place search. |
 
+How Rebuild works:
+
+- A trip with stops on any day is rebuilt, not built. Every stop stays on its day. Only places not on a day yet are added: checked saved places, and backlog places that have no checkbox. Each goes to the nearest day in its city that it can be visited on and that has room.
+- Unchecked places still leave the trip, except locked stops, which never move.
+- Only days that changed are optimized again.
+- `POST /api/trips/{id}/build/preview` runs the build and rolls it back. The setup page lists each place that would change day, join, or leave. "Apply changes" sends that plan back to `/build`, which saves it exactly. Running the build again could differ, because the solver stops at a time limit.
+- The Undo toast after a rebuild works as it does after a first build.
+
 ## Look and feel
 
 This replaces the spec's "UI specification" colors, type and component shapes. The layout, the three columns and their breakpoints, the spacing scale, and the screen flow stay as the spec has them.

@@ -1,15 +1,17 @@
 import { createContext, useContext } from 'react';
 import type { Trip } from '../domain/types';
 import type { TripEdit } from '../domain/tripEdits';
-import type { BuildResult, NewExpense, OptimizeResult, SetupChange } from './api';
+import type { BuildResult, NewExpense, OptimizeResult, PlanSnapshot, SetupChange } from './api';
 
 type TripContextValue = {
   trip: Trip;
   /** `animate` glides cards to their new spots, as after Optimize route. */
   edit: (change: TripEdit, animate?: boolean) => void;
   optimize: (dayNumber: number) => Promise<OptimizeResult>;
-  /** Puts these saved places onto days and plans each day. */
-  build: (includedPlaceIds: string[]) => Promise<BuildResult>;
+  /** Puts these saved places onto days and plans each day. With a plan from `preview`, saves exactly that plan. */
+  build: (includedPlaceIds: string[], plan?: PlanSnapshot) => Promise<BuildResult>;
+  /** What `build` would do, without saving anything. */
+  preview: (includedPlaceIds: string[]) => Promise<BuildResult>;
   /** Saves an expense; the server converts it to dollars. Rejects with the server's reason. */
   addExpense: (expense: NewExpense) => Promise<void>;
   removeExpense: (expenseId: string) => Promise<void>;
