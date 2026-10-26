@@ -98,8 +98,12 @@
 .dayRowActive .dayCount {
   color: var(--accent-text);
 }
+.nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s12);
+}
 .backlogRow {
-  margin-top: var(--s8);
   font-weight: 600;
 }
 .pill {
@@ -293,10 +297,14 @@
   text-overflow: ellipsis;
 }
 
-/* Travel leg between two cards: centered text between short dotted lines.
-   Its space above and below is equal; the layout test checks that. */
+/* The connector between two neighboring cards. Every connector has the same height, so every
+   pair of cards in the itinerary is the same distance apart. The layout test checks that. */
+.connector {
+  height: var(--s48);
+  list-style: none;
+}
+/* A travel leg is a connector with centered text between short dotted lines. */
 .leg {
-  padding: var(--s8) 0;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -481,12 +489,7 @@
   visibility: hidden;
 }
 
-.dayAlert {
-  list-style: none;
-  margin-top: var(--s8);
-}
 .openTime {
-  margin-top: var(--s16);
   padding: var(--s16) var(--s20);
   display: flex;
   flex-wrap: wrap;
@@ -496,7 +499,6 @@
 }
 .empty {
   list-style: none;
-  margin: var(--s16) 0;
   padding: var(--s48) var(--s24);
   display: flex;
   flex-direction: column;

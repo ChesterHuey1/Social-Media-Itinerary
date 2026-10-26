@@ -109,7 +109,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--s16);
-  margin-top: var(--s8);
 }
 .addForm input {
   background: var(--surface);

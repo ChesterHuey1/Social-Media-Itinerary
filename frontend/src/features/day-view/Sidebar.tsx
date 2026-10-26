@@ -21,7 +21,7 @@ export function Sidebar({ trip, activeDay }: { trip: Trip; activeDay: number }) 
         </Link>
       </section>
 
-      <nav aria-label="Days">
+      <nav aria-label="Days" className={s.nav}>
         <div className={s.days}>
           {trip.days.map((day) => {
             const active = day.number === activeDay;
@@ -41,14 +41,14 @@ export function Sidebar({ trip, activeDay }: { trip: Trip; activeDay: number }) 
               </Link>
             );
           })}
-          <a href="#backlog" className={cx(s.dayRow, s.backlogRow)}>
-            <span className={s.dayNum}>
-              <Icon name="backlog" />
-            </span>
-            <span>Backlog</span>
-            <span className={s.pill}>{trip.backlog.length}</span>
-          </a>
         </div>
+        <a href="#backlog" className={cx(s.dayRow, s.backlogRow)}>
+          <span className={s.dayNum}>
+            <Icon name="backlog" />
+          </span>
+          <span>Backlog</span>
+          <span className={s.pill}>{trip.backlog.length}</span>
+        </a>
       </nav>
 
       <div className={s.budgetGroup}>

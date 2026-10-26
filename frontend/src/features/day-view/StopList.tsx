@@ -9,7 +9,7 @@ import {
 } from '@dnd-kit/core';
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { formatClock, formatDistance, formatDuration, formatUsd } from '../../domain/format';
 import { backlogOpenAt, openTimeAtEnd } from '../../domain/schedule';
 import type { Timeline, TimelineStop } from '../../domain/timeline';
@@ -48,75 +48,96 @@ export function StopList({ day, timeline, onEditStop }: StopListProps) {
     moveStop(ids.indexOf(String(active.id)), ids.indexOf(String(over.id)));
   };
 
+  // Between every two neighboring cards sits exactly one connector of fixed height:
+  // a travel leg when there is travel, an empty spacer when there is not.
   return (
-    <ol className={cx(s.list, dragging && s.dragging)} aria-label={`Stops for Day ${day.number}`}>
-      {day.startRows.map((row, i) => (
-        <FixedRowItem key={`start-${i}`} row={row} />
-      ))}
+    <>
+      <ol className={cx(s.list, dragging && s.dragging)} aria-label={`Stops for Day ${day.number}`}>
+        {day.startRows.map((row, i) => (
+          <Fragment key={`start-${i}`}>
+            {i > 0 && <Spacer />}
+            <FixedRowItem row={row} />
+          </Fragment>
+        ))}
 
-      {timeline.stops.length === 0 && (
-        <EmptyDay dayNumber={day.number} near={stayForDay(trip, day).location} fromMin={day.startMin} />
-      )}
+        {timeline.stops.length === 0 && (
+          <>
+            <Spacer />
+            <EmptyDay dayNumber={day.number} near={stayForDay(trip, day).location} fromMin={day.startMin} />
+            <Spacer />
+          </>
+        )}
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCenter}
-        onDragStart={() => setDragging(true)}
-        onDragEnd={handleDragEnd}
-        onDragCancel={() => setDragging(false)}
-      >
-        <SortableContext items={ids} strategy={verticalListSortingStrategy}>
-          {timeline.stops.map((item, i) => (
-            <SortableStop
-              key={item.stop.id}
-              item={item}
-              number={i + 1}
-              isFirst={i === 0}
-              isLast={i === timeline.stops.length - 1}
-              onMoveUp={() => moveStop(i, i - 1)}
-              onMoveDown={() => moveStop(i, i + 1)}
-              onEdit={() => onEditStop(item.stop.id)}
-              onMoveLater={() => moveStop(i, i + 1)}
-              onToggleLock={() =>
-                edit({
-                  type: 'updateStop',
-                  dayNumber: day.number,
-                  stopId: item.stop.id,
-                  changes: { lockedAtMin: item.stop.lockedAtMin === null ? item.arriveMin : null },
-                })
-              }
-              onMoveToBacklog={() => edit({ type: 'moveToBacklog', dayNumber: day.number, stopId: item.stop.id })}
-            />
-          ))}
-        </SortableContext>
-      </DndContext>
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragStart={() => setDragging(true)}
+          onDragEnd={handleDragEnd}
+          onDragCancel={() => setDragging(false)}
+          // dnd-kit's screen-reader announcements are divs; an <ol> may only hold <li>.
+          accessibility={{ container: document.body }}
+        >
+          <SortableContext items={ids} strategy={verticalListSortingStrategy}>
+            {timeline.stops.map((item, i) => (
+              <SortableStop
+                key={item.stop.id}
+                item={item}
+                number={i + 1}
+                isFirst={i === 0}
+                isLast={i === timeline.stops.length - 1}
+                onMoveUp={() => moveStop(i, i - 1)}
+                onMoveDown={() => moveStop(i, i + 1)}
+                onEdit={() => onEditStop(item.stop.id)}
+                onMoveLater={() => moveStop(i, i + 1)}
+                onToggleLock={() =>
+                  edit({
+                    type: 'updateStop',
+                    dayNumber: day.number,
+                    stopId: item.stop.id,
+                    changes: { lockedAtMin: item.stop.lockedAtMin === null ? item.arriveMin : null },
+                  })
+                }
+                onMoveToBacklog={() => edit({ type: 'moveToBacklog', dayNumber: day.number, stopId: item.stop.id })}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
 
-      {gap && last && (
-        <li>
-          <OpenTimeBlock dayNumber={day.number} fromMin={gap.fromMin} toMin={gap.toMin} near={last.place.location} area={last.place.area} />
-        </li>
-      )}
+        {gap && last && <Spacer />}
+        {gap && last && (
+          <li>
+            <OpenTimeBlock dayNumber={day.number} fromMin={gap.fromMin} toMin={gap.toMin} near={last.place.location} area={last.place.area} />
+          </li>
+        )}
 
-      {timeline.returnLeg && (
-        <li>
-          <LegItem leg={timeline.returnLeg} />
-        </li>
-      )}
+        {timeline.returnLeg && (
+          <li>
+            <LegItem leg={timeline.returnLeg} />
+          </li>
+        )}
+
+        {day.endRows.map((row, i) => (
+          <Fragment key={`end-${i}`}>
+            {i > 0 && <Spacer />}
+            <FixedRowItem row={row} />
+          </Fragment>
+        ))}
+      </ol>
 
       {timeline.overrunMin > 0 && (
-        <li className={cx(s.alert, s.dayAlert)} role="alert">
+        <p className={s.alert} role="alert">
           <Icon name="clock" />
           <span>
             Back at {formatClock(timeline.backAtMin)}, {formatDuration(timeline.overrunMin)} after your {formatClock(day.endMin)} end.
           </span>
-        </li>
+        </p>
       )}
-
-      {day.endRows.map((row, i) => (
-        <FixedRowItem key={`end-${i}`} row={row} />
-      ))}
-    </ol>
+    </>
   );
+}
+
+function Spacer() {
+  return <li className={s.connector} aria-hidden="true" />;
 }
 
 type SortableStopProps = {
@@ -168,7 +189,7 @@ function LegItem({ leg }: { leg: Leg }) {
   ];
   if (leg.fareUsd !== null) parts.push(formatUsd(leg.fareUsd, true));
   return (
-    <div className={s.leg}>
+    <div className={cx(s.connector, s.leg)}>
       <Icon name={leg.mode === 'walk' ? 'walk' : 'train'} label={leg.mode === 'walk' ? 'Walk' : 'Transit'} />
       {parts.join(' · ')}
     </div>
