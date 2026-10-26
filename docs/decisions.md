@@ -64,6 +64,24 @@ The scraper (`uv run python -m pinpoint.enrich`) fetches a place's homepage and 
 - Booking and price lines are recorded with their evidence but not applied. On a page listing many bars or shops, a pattern can't tell whose rule a line describes.
 - When a site disagrees with a value we already have, the report flags it and nothing changes.
 
+### Third-party sources (changes the spec)
+
+The spec said v1 does no crawling of blogs or itinerary sites. That changed on 2026-10-26: the scraper also reads what others say about each place, always through official APIs and never by getting around robots.txt or blocks.
+
+| Source | How | Needs |
+|---|---|---|
+| Wikivoyage | Wikimedia API; reads the structured listing (hours, price, description) for the place | Nothing |
+| Wikipedia | Wikimedia API; the article summary | Nothing |
+| Reddit | Reddit's official Data API; searches the city's travel subreddits and reads top comments. Reddit's robots.txt disallows all crawling, so this is the only allowed route | A free "script" app: `REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USERNAME` |
+| Travel blogs | Brave Search API finds posts; the polite scraper reads them. Tripadvisor, Yelp, booking sites and social networks are never read | `BRAVE_SEARCH_API_KEY` |
+
+Rules:
+
+- What third-party sources say is **recorded in `place_facts` under the source's name and never applied** to a place. The report shows it beside the official value.
+- A listing or article counts only if it names the same place: the same distinctive words (ignoring accents and words like temple, market, street), with only the place's own area or city as extras. Wikivoyage guides must be about the place's city.
+- Tips are sentences that name the place and give advice (lines, booking, when to go, cash). DeepSeek will summarize them once connected.
+- Documents are reused for 30 days. `--force sources` refreshes only third-party sources.
+
 ### Budget
 
 - Categories are Flights, Stay, Food, Tickets and Transit. The spec listed four but filed flight costs under Flights.

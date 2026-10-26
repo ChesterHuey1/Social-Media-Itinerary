@@ -30,6 +30,7 @@ def test_reads_last_entry_price_and_booking() -> None:
     assert found["booking"] == {"needed": True}
     assert facts("入場料 大人 500円")["cost"] == {"jpy": 500}
     assert facts("ご来店は要予約です")["booking"] == {"needed": True}
+    assert facts("Book tickets online, it sells out on weekends")["booking"] == {"needed": True}
 
 
 def test_keeps_the_line_each_fact_came_from() -> None:

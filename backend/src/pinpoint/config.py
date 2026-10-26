@@ -23,6 +23,14 @@ class Settings(BaseSettings):
     # Named in the scraper's user agent so site owners can reach whoever runs it. Your choice to fill in.
     scraper_contact: str = ""
 
+    # Reddit's Data API: a free "script" app at https://www.reddit.com/prefs/apps. Empty skips Reddit.
+    reddit_client_id: str = ""
+    reddit_client_secret: str = ""
+    reddit_username: str = ""
+
+    # Brave Search API, used to find travel blogs. Empty skips blogs.
+    brave_search_api_key: str = ""
+
 
 @lru_cache
 def get_settings() -> Settings:

@@ -37,7 +37,8 @@ _YEN = re.compile(r"(?:¥|￥)\s?([\d,]{3,})|([\d,]{3,})\s?(?:円|yen|JPY)", re.
 _PRICE_WORDS = re.compile(r"admission|ticket|adult|fee|price|入場料|入館料|料金|大人|拝観料", re.IGNORECASE)
 _BOOKING = re.compile(
     r"reservations? (?:are )?(?:required|recommended)|advance (?:tickets?|reservations?|booking)|"
-    r"book (?:in advance|ahead)|timed[- ]entry|要予約|事前予約|予約制|予約が必要",
+    r"book (?:in advance|ahead)|book (?:your )?tickets?|sells? out|sold out|timed[- ]entry|"
+    r"要予約|事前予約|予約制|予約が必要",
     re.IGNORECASE,
 )
 

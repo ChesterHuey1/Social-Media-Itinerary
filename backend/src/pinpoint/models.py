@@ -37,6 +37,8 @@ def one_of(column: str, values: tuple[str, ...]) -> CheckConstraint:
 OBJECTIVES = ("eat", "explore", "pictures", "experience")
 STOP_COLORS = ("green", "blue", "amber", "ink")
 FACT_SOURCES = ("google", "scrape", "deepseek")
+# Third-party sources. What they say is recorded in place_facts but never applied to a place.
+COMMUNITY_SOURCES = ("wikivoyage", "wikipedia", "reddit", "blog")
 Money = Numeric(10, 2)
 
 
@@ -80,11 +82,13 @@ class Place(Base):
 
 
 class ScrapedPage(Base):
-    """One fetch of a place's own website. The text is kept so facts can be re-read without fetching again."""
+    """One fetched page about a place: its own website, or a third-party source such as Wikivoyage or Reddit.
+    The text is kept so facts can be re-read without fetching again."""
 
     __tablename__ = "scraped_pages"
     __table_args__ = (
         one_of("outcome", ("stored", "robots_disallowed", "blocked", "needs_javascript", "not_html", "error")),
+        one_of("kind", ("official", *COMMUNITY_SOURCES)),
     )
 
     url: Mapped[str] = mapped_column(String, primary_key=True)
@@ -92,6 +96,8 @@ class ScrapedPage(Base):
     fetched_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     http_status: Mapped[int | None]
     outcome: Mapped[str]
+    # "official" for the place's own website, else the third-party source the page came from.
+    kind: Mapped[str] = mapped_column(String, server_default="official")
     title: Mapped[str | None]
     # sha256 of the cleaned text, to tell whether the page changed since last time.
     content_hash: Mapped[str | None] = mapped_column(String(64))
@@ -106,8 +112,8 @@ class PlaceFact(Base):
     __tablename__ = "place_facts"
     __table_args__ = (
         UniqueConstraint("place_id", "field", "source"),
-        one_of("field", ("hours", "last_entry", "cost", "booking")),
-        one_of("source", FACT_SOURCES),
+        one_of("field", ("hours", "last_entry", "cost", "booking", "tip")),
+        one_of("source", FACT_SOURCES + COMMUNITY_SOURCES),
     )
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
