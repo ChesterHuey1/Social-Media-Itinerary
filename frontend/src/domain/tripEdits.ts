@@ -10,7 +10,9 @@ export type TripEdit =
   | { type: 'updateStop'; dayNumber: number; stopId: string; changes: StopChanges }
   | { type: 'addComment'; dayNumber: number; stopId: string; commentId: string; body: string; createdAt: string }
   | { type: 'moveToBacklog'; dayNumber: number; stopId: string }
-  | { type: 'addFromBacklog'; dayNumber: number; stop: Stop };
+  | { type: 'addFromBacklog'; dayNumber: number; stop: Stop }
+  /** Puts a day back to exactly these stops. Undo after Optimize route sends the day's previous stops. */
+  | { type: 'replaceDayStops'; dayNumber: number; stops: Stop[] };
 
 
 function updateDay(trip: Trip, dayNumber: number, change: (day: Day) => Day): Trip {
@@ -62,6 +64,12 @@ export function applyTripEdit(trip: Trip, edit: TripEdit): Trip {
         ...withoutStop,
         backlog: [{ placeId: stop.placeId, reason: `Moved here from Day ${edit.dayNumber}.` }, ...trip.backlog],
       };
+    }
+
+    case 'replaceDayStops': {
+      const placeIds = new Set(edit.stops.map((s) => s.placeId));
+      const withStops = updateDay(trip, edit.dayNumber, (day) => ({ ...day, stops: edit.stops }));
+      return { ...withStops, backlog: trip.backlog.filter((b) => !placeIds.has(b.placeId)) };
     }
 
     case 'addFromBacklog': {

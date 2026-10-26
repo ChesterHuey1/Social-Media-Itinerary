@@ -106,3 +106,14 @@ button {
   outline: none;
   box-shadow: 0 0 0 2px var(--accent), 0 0 0 5px var(--focus-ring);
 }
+
+/* After Optimize route, cards move to their new spots in 300 ms (spec, Motion). Only elements with a
+   view-transition-name move; the page itself does not fade. */
+::view-transition-group(*) {
+  animation-duration: 300ms;
+  animation-timing-function: ease-out;
+}
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}

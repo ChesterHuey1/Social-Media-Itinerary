@@ -24,9 +24,29 @@ describe('buildTimeline', () => {
     expect(t.stops.map((x) => x.arriveMin)).toEqual([560, 610]);
   });
 
-  it('flags a stop that is closed when you arrive, with its opening time', () => {
+  it('flags a stop you would reach more than 20 minutes before it opens', () => {
+    // Arrive at c (opens noon) at 10:40, 80 minutes early: the order is wrong.
+    const t = timelineFor([stop('s1', 'a', 60), stop('s2', 'c', 60)]);
+    expect(t.stops[1].problem).toEqual({ kind: 'hours', check: { ok: false, reason: 'not-open-yet', opensAt: 720 } });
+  });
+
+  it('waits up to 20 minutes for opening', () => {
+    // Leave a at 11:20, arrive at c at 11:40, wait 20 minutes until noon.
+    const t = timelineFor([stop('s1', 'a', 120), stop('s2', 'c', 60)]);
+    expect(t.stops[1].arriveMin).toBe(720);
+    expect(t.stops[1].problem).toBeNull();
+  });
+
+  it('leaves the hotel later when the first stop opens late', () => {
     const t = timelineFor([stop('s1', 'c', 60)]);
-    expect(t.stops[0].problem).toEqual({ kind: 'hours', check: { ok: false, reason: 'not-open-yet', opensAt: 720 } });
+    expect(t.stops[0].arriveMin).toBe(720);
+    expect(t.stops[0].problem).toBeNull();
+  });
+
+  it('estimates legs with the same numbers as the backend', () => {
+    // Same cases as backend/tests/test_optimize.py::test_estimate_matches_the_frontend.
+    expect(estimateLeg({ lat: 35.6654, lng: 139.7707 }, { lat: 35.6672, lng: 139.764 })).toMatchObject({ mode: 'walk', minutes: 12, distanceM: 850 });
+    expect(estimateLeg({ lat: 35.6614, lng: 139.7016 }, { lat: 35.6491, lng: 139.7898 })).toMatchObject({ mode: 'transit', minutes: 35, distanceM: 10500 });
   });
 
   it('waits for a locked time when early, which also clears an hours problem', () => {

@@ -235,4 +235,27 @@ class AddFromBacklog(Schema):
     stop: Stop
 
 
-TripEdit = Annotated[MoveStop | UpdateStop | AddComment | MoveToBacklog | AddFromBacklog, Field(discriminator="type")]
+class ReplaceDayStops(Schema):
+    """Puts a day back to exactly these stops. Undo after Optimize route sends the day's previous stops."""
+
+    type: Literal["replaceDayStops"]
+    day_number: int
+    stops: list[Stop]
+
+
+TripEdit = Annotated[
+    MoveStop | UpdateStop | AddComment | MoveToBacklog | AddFromBacklog | ReplaceDayStops,
+    Field(discriminator="type"),
+]
+
+
+class DroppedStop(Schema):
+    place_id: str
+    reason: str
+
+
+class OptimizeResult(Schema):
+    trip: Trip
+    # The day before optimizing, for Undo.
+    previous_stops: list[Stop]
+    dropped: list[DroppedStop]

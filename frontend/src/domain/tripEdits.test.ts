@@ -43,6 +43,19 @@ describe('applyTripEdit', () => {
     expect(restored.days[0].stops[2]).toMatchObject({ placeId: 'b', stay: { minutes: 90, source: 'estimate' } });
   });
 
+  it('puts a day back to exactly the given stops and takes them out of the backlog', () => {
+    const original = base();
+    const changed = applyTripEdit(applyTripEdit(original, { type: 'moveToBacklog', dayNumber: 1, stopId: 's2' }), {
+      type: 'moveStop',
+      dayNumber: 1,
+      fromIndex: 0,
+      toIndex: 1,
+    });
+    const undone = applyTripEdit(changed, { type: 'replaceDayStops', dayNumber: 1, stops: original.days[0].stops });
+    expect(undone.days[0].stops).toEqual(original.days[0].stops);
+    expect(undone.backlog).toEqual(original.backlog);
+  });
+
   it('refuses to add a place that is not in the backlog', () => {
     const trip = base();
     expect(applyTripEdit(trip, { type: 'addFromBacklog', dayNumber: 1, stop: stopFromBacklog(trip, 1, 'a', 'x') })).toBe(trip);

@@ -5,13 +5,20 @@ import { Button } from '../../ui/Button';
 import s from './DayView.module.css';
 
 /** An empty day has no route to optimize; its primary button is Add a place in the empty state. */
-type DayHeaderProps = { day: Day; stay: Stay; summary: DaySummary; onShowMap: () => void };
+type DayHeaderProps = {
+  day: Day;
+  stay: Stay;
+  summary: DaySummary;
+  optimizing: boolean;
+  onOptimize: () => void;
+  onShowMap: () => void;
+};
 
 function totalText(summary: DaySummary): string {
   return `${summary.estimated ? 'About ' : ''}${formatUsd(summary.totalUsd)}`;
 }
 
-export function DayHeader({ day, stay, summary, onShowMap }: DayHeaderProps) {
+export function DayHeader({ day, stay, summary, optimizing, onOptimize, onShowMap }: DayHeaderProps) {
   const hasStops = summary.stopCount > 0;
   return (
     <header className={s.header}>
@@ -32,8 +39,8 @@ export function DayHeader({ day, stay, summary, onShowMap }: DayHeaderProps) {
         </Button>
         {hasStops && <Button icon="plus">Add place</Button>}
         {hasStops && (
-          <Button variant="primary" icon="route">
-            Optimize route
+          <Button variant="primary" icon="route" onClick={onOptimize} disabled={optimizing}>
+            {optimizing ? 'Optimizing…' : 'Optimize route'}
           </Button>
         )}
       </div>

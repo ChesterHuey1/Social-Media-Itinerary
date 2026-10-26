@@ -83,6 +83,34 @@ def apply_edit(session: Session, trip_id: str, edit: schemas.TripEdit) -> None:
                 )
             )
 
+        case schemas.ReplaceDayStops(day_number=n, stops=wanted):
+            day = _day(session, trip_id, n)
+            current = {s.id: s for s in day.stops}
+            keep = []
+            for position, new in enumerate(wanted):
+                stop = current.pop(new.id, None) or models.Stop(
+                    id=new.id,
+                    place_id=new.place_id,
+                    comments=[
+                        models.Comment(id=c.id, body=c.body, created_at=date.fromisoformat(c.created_at))
+                        for c in new.comments
+                    ],
+                )
+                stop.position = position
+                stop.title, stop.color, stop.objectives = new.title, new.color, new.objectives
+                stop.stay_minutes, stop.stay_source = new.stay.minutes, new.stay.source
+                stop.locked_at_min = new.locked_at_min
+                keep.append(stop)
+            day.stops = keep
+            # Places back on the day leave the backlog.
+            for item in session.scalars(
+                select(models.BacklogItem).where(
+                    models.BacklogItem.trip_id == trip_id,
+                    models.BacklogItem.place_id.in_([s.place_id for s in wanted]),
+                )
+            ):
+                session.delete(item)
+
         case schemas.AddFromBacklog(day_number=n, stop=new):
             day = _day(session, trip_id, n)
             item = session.scalar(

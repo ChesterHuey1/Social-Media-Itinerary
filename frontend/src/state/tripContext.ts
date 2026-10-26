@@ -1,10 +1,13 @@
 import { createContext, useContext } from 'react';
 import type { Trip } from '../domain/types';
 import type { TripEdit } from '../domain/tripEdits';
+import type { OptimizeResult } from './api';
 
 type TripContextValue = {
   trip: Trip;
-  edit: (change: TripEdit) => void;
+  /** `animate` glides cards to their new spots, as after Optimize route. */
+  edit: (change: TripEdit, animate?: boolean) => void;
+  optimize: (dayNumber: number) => Promise<OptimizeResult>;
   /** True when the last save failed and the screen was reset to the stored trip. */
   saveError: boolean;
 };

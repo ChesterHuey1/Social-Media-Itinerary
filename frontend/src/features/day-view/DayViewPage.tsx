@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { daySummary } from '../../domain/schedule';
 import { buildTimeline } from '../../domain/timeline';
@@ -11,8 +11,12 @@ import { DayBreakdown, DayHeader } from './DayHeader';
 import s from './DayView.module.css';
 import { EditStopPanel } from './EditStopPanel';
 import { MapPanel } from './MapPanel';
+import { OptimizeToast, type ToastState } from './OptimizeToast';
 import { Sidebar } from './Sidebar';
 import { StopList } from './StopList';
+
+/** How long Undo stays available after Optimize route. */
+const UNDO_MS = 10_000;
 
 type ViewTab = 'list' | 'map' | 'budget';
 const VIEW_TABS: { id: ViewTab; label: string }[] = [
@@ -23,7 +27,10 @@ const VIEW_TABS: { id: ViewTab; label: string }[] = [
 
 export function DayViewPage() {
   const { dayNumber } = useParams();
-  const { trip, saveError } = useTrip();
+  const { trip, edit, optimize, saveError } = useTrip();
+  const [optimizing, setOptimizing] = useState(false);
+  const [toast, setToast] = useState<ToastState | null>(null);
+  const toastTimer = useRef<number | undefined>(undefined);
   const [editingStopId, setEditingStopId] = useState<string | null>(null);
   const [tab, setTab] = useState<ViewTab>('list');
   const [mapOpen, setMapOpen] = useState(false);
@@ -36,6 +43,32 @@ export function DayViewPage() {
   const summary = daySummary(timeline);
   const unmatchedPosts = trip.savedPosts.filter((p) => p.status === 'needs_review').length;
   const editingIndex = timeline.stops.findIndex((t) => t.stop.id === editingStopId);
+
+  const showToast = (next: ToastState | null) => {
+    window.clearTimeout(toastTimer.current);
+    setToast(next);
+    if (next) toastTimer.current = window.setTimeout(() => setToast(null), UNDO_MS);
+  };
+
+  const runOptimize = async () => {
+    setOptimizing(true);
+    try {
+      const result = await optimize(day.number);
+      const moved = result.dropped.length;
+      const dayNumber = day.number;
+      showToast({
+        message: moved === 0 ? 'Optimized. Every stop is open when you arrive.' : `Optimized. ${moved} ${moved === 1 ? 'stop' : 'stops'} moved to the backlog.`,
+        onUndo: () => {
+          edit({ type: 'replaceDayStops', dayNumber, stops: result.previousStops }, true);
+          showToast({ message: 'Back to your order.', onUndo: null });
+        },
+      });
+    } catch {
+      showToast({ message: "Couldn't optimize this day. Try again.", onUndo: null });
+    } finally {
+      setOptimizing(false);
+    }
+  };
 
   return (
     <div className={s.page} data-tab={tab} data-map-open={mapOpen}>
@@ -74,13 +107,22 @@ export function DayViewPage() {
             </a>
           </div>
         )}
-        <DayHeader day={day} stay={stay} summary={summary} onShowMap={() => setMapOpen(true)} />
+        <DayHeader
+          day={day}
+          stay={stay}
+          summary={summary}
+          optimizing={optimizing}
+          onOptimize={runOptimize}
+          onShowMap={() => setMapOpen(true)}
+        />
         <StopList day={day} timeline={timeline} onEditStop={setEditingStopId} />
         {summary.stopCount > 0 && <DayBreakdown summary={summary} />}
         <Backlog dayNumber={day.number} />
       </main>
 
       <MapPanel day={day} stay={stay} timeline={timeline} onClose={() => setMapOpen(false)} />
+
+      {toast && <OptimizeToast toast={toast} onClose={() => showToast(null)} />}
 
       {editingIndex >= 0 && (
         <EditStopPanel

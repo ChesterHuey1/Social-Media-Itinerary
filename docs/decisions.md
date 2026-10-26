@@ -32,7 +32,20 @@ The saved list is per user, and a place saved after a trip is built must still r
 
 `saved_post_places` links each post to the places found in it, so one restaurant saved from two Reels is one place with two posts.
 
-### Airport transfers
+### Day timing and Optimize route
+
+The browser's timeline (`frontend/src/domain/timeline.ts`) and the optimizer (`backend/src/pinpoint/plan/optimize.py`) use the same arithmetic, so a plan the optimizer accepts never shows a warning:
+
+- Arrival = when you left the last place + the leg + 10 minutes of slack, in **exact minutes**. Times are no longer rounded up to 5 minutes; rounding made the two disagree by a few minutes per leg.
+- Arriving up to 20 minutes before opening, you wait. Before the first stop there is no cap: you leave the hotel later.
+- A locked stop arrives exactly at its locked time.
+- Optimize route minimizes travel time, then prefers the plan that uses the morning and ends earliest.
+- A stop that can't fit goes to the backlog with a reason, and the toast offers Undo for 10 seconds.
+- Meal-time preferences (breakfast, lunch, dinner windows) are not modeled yet; the spec marks them as soft.
+
+The straight-line leg estimate exists in both languages with the same constants, and both test suites check the same two example legs.
+
+## Airport transfers
 
 | Table | Columns |
 |---|---|

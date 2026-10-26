@@ -62,7 +62,8 @@ export function StopCard(props: StopCardProps) {
   const cost = costText(place);
 
   return (
-    <article className={cx(s.card, s.stop)}>
+    // The view-transition name lets the card glide to its new spot after Optimize route.
+    <article className={cx(s.card, s.stop)} style={{ viewTransitionName: `stop-${stop.id}` }}>
       <div className={s.stopHead}>
         <button type="button" className={s.handle} {...dragHandle} aria-label={`Drag to reorder ${name}`}>
           <Icon name="grip" />

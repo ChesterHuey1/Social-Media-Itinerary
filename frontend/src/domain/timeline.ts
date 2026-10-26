@@ -6,8 +6,9 @@ import type { Day, LatLng, Leg, LegKey, Objective, Place, Stop, Trip } from './t
 
 /** Extra minutes per leg for finding the entrance or a late train. */
 export const LEG_SLACK_MIN = 10;
+/** Arriving up to this long before opening, you wait. Any earlier means the order is wrong (spec). */
+export const MAX_WAIT_MIN = 20;
 
-const ROUND_TO_MIN = 5;
 const DETOUR_FACTOR = 1.3;
 const WALK_LIMIT_M = 1500;
 const WALK_M_PER_MIN = 75;
@@ -75,14 +76,11 @@ function legBetween(trip: Trip, from: RouteNode, to: RouteNode): Leg {
   return trip.legs[legKey(from.id, to.id)] ?? estimateLeg(from.location, to.location);
 }
 
-function roundUp(min: number): number {
-  return Math.ceil(min / ROUND_TO_MIN) * ROUND_TO_MIN;
-}
-
 /**
  * Walks the day in order: leave the hotel at the start time, travel each leg plus slack,
- * wait for a locked time if early, and stay the planned minutes. Then checks every stop
- * against its opening hours with the arrival time it actually gets.
+ * wait for a locked time if early, wait for opening if within MAX_WAIT_MIN (or leave the hotel later
+ * for the first stop), and stay the planned minutes. Every stop is checked against its opening hours
+ * with the arrival time it actually gets. backend/src/pinpoint/plan/optimize.py plans by the same rules.
  */
 export function buildTimeline(trip: Trip, day: Day): Timeline {
   const stay = stayForDay(trip, day);
@@ -94,7 +92,8 @@ export function buildTimeline(trip: Trip, day: Day): Timeline {
     const place = trip.places[stop.placeId];
     const node: RouteNode = { id: place.id, location: place.location };
     const legBefore = legBetween(trip, previous, node);
-    const earliest = roundUp(clock + legBefore.minutes + LEG_SLACK_MIN);
+    // Exact minutes, no rounding, so this matches the backend optimizer's arithmetic.
+    const earliest = clock + legBefore.minutes + LEG_SLACK_MIN;
 
     let arriveMin = earliest;
     let problem: StopProblem | null = null;
@@ -103,7 +102,13 @@ export function buildTimeline(trip: Trip, day: Day): Timeline {
       else arriveMin = stop.lockedAtMin;
     }
     if (!problem) {
-      const check = checkVisit(arriveMin, stop.stay.minutes, place.hours, place.lastEntryMin);
+      let check = checkVisit(arriveMin, stop.stay.minutes, place.hours, place.lastEntryMin);
+      // Wait for opening: for the first stop you just leave later; elsewhere, up to MAX_WAIT_MIN.
+      const isFirst = previous === hotel;
+      if (!check.ok && check.reason === 'not-open-yet' && (isFirst || check.opensAt - arriveMin <= MAX_WAIT_MIN)) {
+        arriveMin = check.opensAt;
+        check = checkVisit(arriveMin, stop.stay.minutes, place.hours, place.lastEntryMin);
+      }
       if (!check.ok) problem = { kind: 'hours', check };
     }
 
@@ -114,6 +119,6 @@ export function buildTimeline(trip: Trip, day: Day): Timeline {
   });
 
   const returnLeg = stops.length > 0 ? legBetween(trip, previous, hotel) : null;
-  const backAtMin = returnLeg ? roundUp(clock + returnLeg.minutes + LEG_SLACK_MIN) : day.startMin;
+  const backAtMin = returnLeg ? clock + returnLeg.minutes + LEG_SLACK_MIN : day.startMin;
   return { stops, returnLeg, backAtMin, overrunMin: Math.max(0, backAtMin - day.endMin) };
 }

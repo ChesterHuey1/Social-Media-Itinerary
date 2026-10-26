@@ -38,7 +38,7 @@ def _place(p: models.Place) -> schemas.Place:
     )
 
 
-def _stop(s: models.Stop) -> schemas.Stop:
+def stop_schema(s: models.Stop) -> schemas.Stop:
     return schemas.Stop(
         id=s.id,
         place_id=s.place_id,
@@ -134,7 +134,7 @@ def load_trip(session: Session, trip_id: str) -> schemas.Trip:
                 end_min=d.end_min,
                 start_rows=d.start_rows,
                 end_rows=d.end_rows,
-                stops=[_stop(s) for s in d.stops],
+                stops=[stop_schema(s) for s in d.stops],
             )
             for d in trip.days
         ],

@@ -944,3 +944,36 @@
     border-radius: 0;
   }
 }
+
+/* ---------- Toast after Optimize route ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: var(--s24);
+  transform: translateX(-50%);
+  z-index: 30;
+  max-width: calc(100vw - var(--s32));
+  padding: var(--s8) var(--s8) var(--s8) var(--s16);
+  border-radius: var(--radius-card);
+  background: var(--ink);
+  color: var(--surface);
+  box-shadow: var(--shadow-lift);
+  display: flex;
+  align-items: center;
+  gap: var(--s12);
+  font-size: 14px;
+}
+.toast button {
+  color: var(--surface);
+}
+.toastClose {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}

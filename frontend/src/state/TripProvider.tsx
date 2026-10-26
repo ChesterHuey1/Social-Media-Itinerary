@@ -1,16 +1,24 @@
 import { use, useRef, useState, type ReactNode } from 'react';
+import { flushSync } from 'react-dom';
 import { applyTripEdit, type TripEdit } from '../domain/tripEdits';
 import type { Trip } from '../domain/types';
-import { fetchTrip, saveEdit, TRIP_ID } from './api';
+import { fetchTrip, optimizeDay, saveEdit, TRIP_ID, type OptimizeResult } from './api';
 import { TripContext } from './tripContext';
 
 // Started once, outside render, and read with use() so loading needs no effect.
 const initialTrip = fetchTrip(TRIP_ID);
 
+/** Swaps in a new trip with a View Transition, so cards glide to new spots (300 ms, set in tokens.css). */
+function showWithTransition(update: () => void) {
+  if (typeof document.startViewTransition === 'function') document.startViewTransition(() => flushSync(update));
+  else update();
+}
+
 /**
  * Each edit shows on screen at once, then saves to the server in order.
  * When the last save in flight comes back, the screen takes the server's copy.
  * If a save fails, the screen reloads the stored trip and says so.
+ * Optimize route waits its turn behind pending saves, then shows the server's new order.
  */
 export function TripProvider({ children }: { children: ReactNode }) {
   const [trip, setTrip] = useState<Trip>(use(initialTrip));
@@ -18,8 +26,9 @@ export function TripProvider({ children }: { children: ReactNode }) {
   const queue = useRef<Promise<void>>(Promise.resolve());
   const inFlight = useRef(0);
 
-  const edit = (change: TripEdit) => {
-    setTrip((current) => applyTripEdit(current, change));
+  const edit = (change: TripEdit, animate = false) => {
+    if (animate) showWithTransition(() => setTrip((current) => applyTripEdit(current, change)));
+    else setTrip((current) => applyTripEdit(current, change));
     inFlight.current += 1;
     queue.current = queue.current.then(async () => {
       try {
@@ -35,5 +44,18 @@ export function TripProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  return <TripContext value={{ trip, edit, saveError }}>{children}</TripContext>;
+  const optimize = (dayNumber: number) =>
+    new Promise<OptimizeResult>((resolve, reject) => {
+      queue.current = queue.current.then(async () => {
+        try {
+          const result = await optimizeDay(TRIP_ID, dayNumber);
+          showWithTransition(() => setTrip(result.trip));
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+
+  return <TripContext value={{ trip, edit, optimize, saveError }}>{children}</TripContext>;
 }
