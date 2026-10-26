@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { Trip } from '../domain/types';
 import type { TripEdit } from '../domain/tripEdits';
-import type { BuildResult, OptimizeResult } from './api';
+import type { BuildResult, NewExpense, OptimizeResult } from './api';
 
 type TripContextValue = {
   trip: Trip;
@@ -10,6 +10,9 @@ type TripContextValue = {
   optimize: (dayNumber: number) => Promise<OptimizeResult>;
   /** Puts these saved places onto days and plans each day. */
   build: (includedPlaceIds: string[]) => Promise<BuildResult>;
+  /** Saves an expense; the server converts it to dollars. Rejects with the server's reason. */
+  addExpense: (expense: NewExpense) => Promise<void>;
+  removeExpense: (expenseId: string) => Promise<void>;
   /** True when the last save failed and the screen was reset to the stored trip. */
   saveError: boolean;
 };

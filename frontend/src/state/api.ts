@@ -1,5 +1,5 @@
 import type { TripEdit } from '../domain/tripEdits';
-import type { BacklogItem, Stop, Trip } from '../domain/types';
+import type { BacklogItem, SpendingCategory, Stop, Trip } from '../domain/types';
 
 export type PlanSnapshot = { days: { dayNumber: number; stops: Stop[] }[]; backlog: BacklogItem[] };
 
@@ -28,7 +28,11 @@ async function request<T = Trip>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...init });
   // The session ran out: reloading shows sign-in.
   if (response.status === 401) window.location.reload();
-  if (!response.ok) throw new Error(`${init?.method ?? 'GET'} ${path} failed: ${response.status} ${await response.text()}`);
+  if (!response.ok) {
+    // The server's reason, written for people (FastAPI's `detail`), when it gave one.
+    const body = (await response.json().catch(() => null)) as { detail?: unknown } | null;
+    throw new Error(typeof body?.detail === 'string' ? body.detail : `${init?.method ?? 'GET'} ${path} failed: ${response.status}`);
+  }
   return (await response.json()) as T;
 }
 
@@ -57,4 +61,22 @@ export function optimizeDay(id: string, dayNumber: number): Promise<OptimizeResu
 /** Puts the chosen saved places onto days by city and area, then plans each day. */
 export function buildItinerary(id: string, includedPlaceIds: string[]): Promise<BuildResult> {
   return request<BuildResult>('/api/trips/' + id + '/build', { method: 'POST', body: JSON.stringify({ includedPlaceIds }) });
+}
+
+export type NewExpense = { amount: number; currency: string; category: SpendingCategory; note: string; date: string };
+
+/** The rate an expense on this date would use; `rateDate` can be earlier (weekends) or the latest rate (future dates). */
+export type FxQuote = { currency: string; usdPerUnit: number; rateDate: string };
+
+export function fxQuote(currency: string, date: string): Promise<FxQuote> {
+  return request<FxQuote>('/api/fx?' + new URLSearchParams({ currency, date }).toString());
+}
+
+/** The server converts at the expense date's rate and answers with the trip as stored. */
+export function addExpense(id: string, expense: NewExpense): Promise<Trip> {
+  return request('/api/trips/' + id + '/expenses', { method: 'POST', body: JSON.stringify(expense) });
+}
+
+export function deleteExpense(id: string, expenseId: string): Promise<Trip> {
+  return request('/api/trips/' + id + '/expenses/' + expenseId, { method: 'DELETE' });
 }

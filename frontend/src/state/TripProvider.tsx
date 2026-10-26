@@ -2,7 +2,19 @@ import { use, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { applyTripEdit, type TripEdit } from '../domain/tripEdits';
 import type { Trip } from '../domain/types';
-import { buildItinerary, fetchTrip, loadTrip, optimizeDay, saveEdit, TRIP_ID, type BuildResult, type OptimizeResult } from './api';
+import {
+  addExpense as saveExpense,
+  buildItinerary,
+  deleteExpense,
+  fetchTrip,
+  loadTrip,
+  optimizeDay,
+  saveEdit,
+  TRIP_ID,
+  type BuildResult,
+  type NewExpense,
+  type OptimizeResult,
+} from './api';
 import { TripContext } from './tripContext';
 
 /** Swaps in a new trip with a View Transition, so cards glide to new spots (300 ms, set in tokens.css). */
@@ -67,5 +79,23 @@ export function TripProvider({ children }: { children: ReactNode }) {
       });
     });
 
-  return <TripContext value={{ trip, edit, optimize, build, saveError }}>{children}</TripContext>;
+  /** Runs a server call that returns the stored trip, after pending saves, and shows that trip. */
+  const save = (call: () => Promise<Trip>) =>
+    new Promise<void>((resolve, reject) => {
+      queue.current = queue.current.then(async () => {
+        try {
+          setTrip(await call());
+          resolve();
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+
+  const addExpense = (expense: NewExpense) => save(() => saveExpense(TRIP_ID, expense));
+  const removeExpense = (expenseId: string) => save(() => deleteExpense(TRIP_ID, expenseId));
+
+  return (
+    <TripContext value={{ trip, edit, optimize, build, addExpense, removeExpense, saveError }}>{children}</TripContext>
+  );
 }

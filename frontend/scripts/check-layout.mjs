@@ -17,7 +17,8 @@ const WIDTHS = [
   { name: 'phone', width: 390, height: 844 },
 ];
 // '#signed-out' answers the session check with 401, so the sign-in screen shows.
-const PAGES = ['/trip/day/1', '/trip/day/2', '/trip/day/4', '/setup', '/setup#signed-out'];
+// '#add-expense' opens the expense form in the budget panel.
+const PAGES = ['/trip/day/1', '/trip/day/1#add-expense', '/trip/day/2', '/trip/day/4', '/setup', '/setup#signed-out'];
 const TOLERANCE_PX = 1;
 // The API is answered with the backend's seed file, so this test needs no database.
 const SEED = JSON.parse(readFileSync(new URL('../../backend/src/pinpoint/seed/demo_trip.json', import.meta.url), 'utf8'));
@@ -32,10 +33,18 @@ try {
   for (const size of WIDTHS) {
     const page = await browser.newPage({ viewport: { width: size.width, height: size.height } });
     await page.route('**/api/trips/demo', (route) => route.fulfill({ json: SEED }));
+    await page.route('**/api/fx?*', (route) => route.fulfill({ json: { currency: 'JPY', usdPerUnit: 0.0063774, rateDate: '2026-10-23' } }));
     await page.route('**/api/auth/me', (route) => route.fulfill({ status: page.url().includes('#signed-out') ? 401 : 204 }));
     for (const path of PAGES) {
       await page.goto(base + path, { waitUntil: 'networkidle' });
       await page.evaluate(() => document.fonts.ready);
+      if (path.endsWith('#add-expense')) {
+        // On phones the budget sits behind its tab.
+        if (size.width < 1024) await page.getByRole('tab', { name: 'Budget' }).click();
+        await page.getByRole('button', { name: 'Add expense' }).click();
+        await page.getByLabel('Amount').fill('3200');
+        await page.getByText('at the Oct 23 rate').waitFor();
+      }
       const where = `${size.name} ${path}`;
 
       const offScale = await page.evaluate((scale) => {

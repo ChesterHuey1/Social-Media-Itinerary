@@ -1,4 +1,10 @@
-import { useId, type InputHTMLAttributes, type ReactNode, type TextareaHTMLAttributes } from 'react';
+import {
+  useId,
+  type InputHTMLAttributes,
+  type ReactNode,
+  type SelectHTMLAttributes,
+  type TextareaHTMLAttributes,
+} from 'react';
 import { cx } from './cx';
 import ui from './ui.module.css';
 
@@ -21,7 +27,27 @@ export function TextField({ label, time, derived, className, ...input }: FieldPr
   );
 }
 
-type AreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string };
+type SelectProps = SelectHTMLAttributes<HTMLSelectElement> & { label: string; options: readonly { value: string; label: string }[] };
+
+export function SelectField({ label, options, className, ...select }: SelectProps) {
+  const id = useId();
+  return (
+    <div className={cx(ui.field, className)}>
+      <label htmlFor={id} className={ui.fieldLabel}>
+        {label}
+      </label>
+      <select id={id} className={ui.input} {...select}>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+type AreaProps =TextareaHTMLAttributes<HTMLTextAreaElement> & { label: string };
 
 export function TextArea({ label, className, ...area }: AreaProps) {
   const id = useId();

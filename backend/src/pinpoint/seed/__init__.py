@@ -96,7 +96,15 @@ def seed_demo(session: Session) -> None:
             ],
             expenses=[
                 models.Expense(
-                    id=e.id, amount_usd=e.amount_usd, category=e.category, note=e.note, date=date.fromisoformat(e.date)
+                    id=e.id,
+                    amount_usd=e.amount_usd,
+                    category=e.category,
+                    note=e.note,
+                    date=date.fromisoformat(e.date),
+                    original_amount=e.original_amount,
+                    original_currency=e.original_currency,
+                    fx_rate=e.fx_rate,
+                    fx_date=None if e.fx_date is None else date.fromisoformat(e.fx_date),
                 )
                 for e in trip.expenses
             ],

@@ -1133,21 +1133,33 @@
       "amountUsd": 60,
       "category": "tickets",
       "note": "teamLab and Shibuya Sky",
-      "date": "2026-10-20"
+      "date": "2026-10-20",
+      "originalAmount": null,
+      "originalCurrency": null,
+      "fxRate": null,
+      "fxDate": null
     },
     {
       "id": "e1",
       "amountUsd": 160,
       "category": "food",
       "note": "Meals so far",
-      "date": "2026-11-12"
+      "date": "2026-11-12",
+      "originalAmount": null,
+      "originalCurrency": null,
+      "fxRate": null,
+      "fxDate": null
     },
     {
       "id": "e3",
       "amountUsd": 20,
       "category": "transit",
       "note": "Suica top-up",
-      "date": "2026-11-12"
+      "date": "2026-11-12",
+      "originalAmount": 3000,
+      "originalCurrency": "JPY",
+      "fxRate": 0.0066667,
+      "fxDate": "2026-10-26"
     }
   ],
   "savedPlaces": [

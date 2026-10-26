@@ -87,6 +87,11 @@ Rules:
 - Categories are Flights, Stay, Food, Tickets and Transit. The spec listed four but filed flight costs under Flights.
 - Flight and stay costs live on their own rows and count toward the budget. They are not copied into `expenses`, so each amount has one writer.
 - `expenses` gains `fx_rate` and `fx_date`, the exchange rate used and its date.
+- The server converts. The form shows the dollar amount from `GET /api/fx` before saving, but `POST /api/trips/{id}/expenses` looks the rate up again and is the only writer of `amount_usd`.
+- Frankfurter has no rate for weekends or for future dates. A weekend uses the business day before, and `fx_date` records that day. A date on or after today uses the latest rate.
+- Past rates never change, so `fx_rates` keeps each one after the first lookup.
+- The currency list is the 30 currencies Frankfurter publishes. `backend/tests/test_budget.py` fails if the frontend's list differs.
+- Expenses are added and removed through their own endpoints, not the plan edits, because only the server knows the rate.
 
 ## Airport transfers
 

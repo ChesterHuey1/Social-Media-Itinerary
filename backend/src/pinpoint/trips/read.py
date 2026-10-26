@@ -152,7 +152,15 @@ def load_trip(session: Session, trip_id: str) -> schemas.Trip:
         backlog=[schemas.BacklogItem(place_id=b.place_id, reason=b.reason) for b in trip.backlog],
         expenses=[
             schemas.Expense(
-                id=e.id, amount_usd=float(e.amount_usd), category=e.category, note=e.note, date=e.date.isoformat()
+                id=e.id,
+                amount_usd=float(e.amount_usd),
+                category=e.category,
+                note=e.note,
+                date=e.date.isoformat(),
+                original_amount=None if e.original_amount is None else float(e.original_amount),
+                original_currency=e.original_currency,
+                fx_rate=None if e.fx_rate is None else float(e.fx_rate),
+                fx_date=None if e.fx_date is None else e.fx_date.isoformat(),
             )
             for e in trip.expenses
         ],

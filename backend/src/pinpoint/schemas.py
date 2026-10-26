@@ -148,12 +148,35 @@ class BacklogItem(Schema):
     reason: str
 
 
+ExpenseCategory = Literal["food", "tickets", "transit"]
+
+
 class Expense(Schema):
     id: str
     amount_usd: float
-    category: Literal["food", "tickets", "transit"]
+    category: ExpenseCategory
     note: str
     date: str
+    # Set when the expense was entered in another currency.
+    original_amount: float | None = None
+    original_currency: str | None = None
+    fx_rate: float | None = None
+    fx_date: str | None = None
+
+
+class NewExpense(Schema):
+    amount: float = Field(gt=0)
+    currency: str
+    category: ExpenseCategory
+    note: str = ""
+    date: str
+
+
+class FxQuote(Schema):
+    currency: str
+    usd_per_unit: float
+    # The day the rate is from, which can be earlier than the day asked for.
+    rate_date: str
 
 
 class SavedPlace(Schema):

@@ -107,10 +107,18 @@ export type BacklogItem = { placeId: string; reason: string };
 export type Expense = {
   id: string;
   amountUsd: number;
-  category: Exclude<ExpenseCategory, 'flights' | 'stay'>;
+  category: SpendingCategory;
   note: string;
   date: string;
+  /** Set when the expense was entered in another currency: what was paid, and the rate and rate date used. */
+  originalAmount: number | null;
+  originalCurrency: string | null;
+  fxRate: number | null;
+  fxDate: string | null;
 };
+
+/** What a new expense can be filed under. Flights and Stay come from their own rows. */
+export type SpendingCategory = Exclude<ExpenseCategory, 'flights' | 'stay'>;
 
 export type SavedPlace = { placeId: string; from: 'reel' | 'search'; reelCount: number; included: boolean };
 

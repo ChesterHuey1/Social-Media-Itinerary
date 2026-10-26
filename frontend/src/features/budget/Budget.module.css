@@ -1,0 +1,109 @@
+.budget {
+  padding: var(--s20);
+  background: var(--surface-alt);
+  border-radius: var(--radius-card);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s12);
+}
+.meta {
+  font-size: 14px;
+  color: var(--muted);
+}
+.figure {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: var(--s8);
+}
+.number {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 32px;
+  line-height: 1;
+}
+.bar {
+  height: 8px;
+  border-radius: var(--radius-tag);
+  background: var(--line);
+  overflow: hidden;
+}
+.barFill {
+  height: 100%;
+  border-radius: var(--radius-tag);
+  background: var(--accent);
+}
+.barOver {
+  background: var(--warn);
+}
+.categories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+  font-size: 14px;
+}
+.row {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* Add expense */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s12);
+}
+.amountRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  gap: var(--s8);
+}
+.preview {
+  font-size: 14px;
+  color: var(--accent-text);
+}
+.error {
+  font-size: 14px;
+  color: var(--warn-text);
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s8);
+}
+
+/* Expense list */
+.expenses {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s8);
+}
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s4);
+}
+.expense {
+  display: flex;
+  align-items: center;
+  gap: var(--s8);
+}
+.expenseText {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+.expenseName {
+  font-size: 14px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.expenseAmount {
+  font-size: 14px;
+}

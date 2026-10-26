@@ -281,6 +281,18 @@ class Expense(Base):
     date: Mapped[date] = mapped_column(Date)
 
 
+class FxRate(Base):
+    """US dollars per unit of a currency on a past date, from Frankfurter. Past rates never change, so they are kept.
+    `rate_date` is the day the rate is from: a weekend or holiday gives the business day before."""
+
+    __tablename__ = "fx_rates"
+
+    currency: Mapped[str] = mapped_column(String(3), primary_key=True)
+    on_date: Mapped[date] = mapped_column(Date, primary_key=True)
+    usd_per_unit: Mapped[Decimal] = mapped_column(Numeric(18, 8))
+    rate_date: Mapped[date] = mapped_column(Date)
+
+
 class SavedPlace(Base):
     """A place the user saved, from a Reel or a search. Status tracks whether a trip uses it."""
 
