@@ -178,6 +178,8 @@ class Flight(Base):
     cost_usd: Mapped[Decimal | None] = mapped_column(Money)
     # Null uses the airport's default buffer.
     buffer_min: Mapped[int | None]
+    # Minutes between the airport and the hotel. Null uses setup/days.py DEFAULT_TRANSFER_MIN.
+    transfer_min: Mapped[int | None]
     big_luggage: Mapped[bool] = mapped_column(default=False)
 
 
@@ -191,11 +193,15 @@ class Day(Base):
     date: Mapped[date] = mapped_column(Date)
     title: Mapped[str]
     note: Mapped[str | None]
+    # The hours you chose. Only Trip setup writes these.
+    preferred_start_min: Mapped[int] = mapped_column(default=510)
+    preferred_end_min: Mapped[int] = mapped_column(default=1290)
+    # Everything below up to `stops` is worked out from flights, hotels and the hours above by
+    # setup/days.py, and written only by setup/service.py `sync_days`.
     stay_id: Mapped[str] = mapped_column(ForeignKey("stays.id"))
     start_min: Mapped[int]
     end_min: Mapped[int]
     # Fixed rows (landing, hotel) shown before the first stop and after the last.
-    # Stored for now; Part 4 derives them from flights and stays.
     start_rows: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
     end_rows: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
 

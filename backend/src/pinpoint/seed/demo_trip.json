@@ -595,7 +595,9 @@
       "timeMin": 700,
       "direction": "arrive",
       "international": true,
-      "costUsd": 980
+      "costUsd": 980,
+      "bufferMin": null,
+      "transferMin": 40
     },
     {
       "id": "home",
@@ -607,7 +609,9 @@
       "timeMin": 975,
       "direction": "depart",
       "international": true,
-      "costUsd": null
+      "costUsd": null,
+      "bufferMin": null,
+      "transferMin": 60
     }
   ],
   "days": [
@@ -616,7 +620,7 @@
       "date": "2026-11-12",
       "title": "Ginza on arrival",
       "stayId": "ginza",
-      "note": "Land 11:40 AM, 90 min for immigration and bags, 40 min to the hotel",
+      "note": "Land 11:40 AM, 90 min for immigration and bags, 40 min to the hotel.",
       "startMin": 830,
       "endMin": 1260,
       "startRows": [
@@ -856,7 +860,7 @@
       "date": "2026-11-15",
       "title": "Move to Kyoto",
       "stayId": "kanra",
-      "note": "Out by 11:00 AM, in from 3:00 PM. A Drop bags stop fills the gap.",
+      "note": "Out by 11:00 AM, in from 3:00 PM.",
       "startMin": 540,
       "endMin": 1260,
       "startRows": [
@@ -951,7 +955,7 @@
       "date": "2026-11-17",
       "title": "Fly home",
       "stayId": "kanra",
-      "note": "Departs 4:15 PM, 3 h at the airport, 60 min to KIX",
+      "note": "Departs 4:15 PM, 3 h at the airport, 60 min to KIX.",
       "startMin": 510,
       "endMin": 735,
       "startRows": [

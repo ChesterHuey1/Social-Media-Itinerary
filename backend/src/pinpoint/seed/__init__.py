@@ -11,6 +11,7 @@ from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
 from pinpoint import models, schemas
+from pinpoint.setup.days import DEFAULT_END_MIN, DEFAULT_START_MIN
 
 DEMO_USER_ID = "me"
 DEMO_FILE = Path(__file__).with_name("demo_trip.json")
@@ -88,6 +89,8 @@ def seed_demo(session: Session) -> None:
                     direction=f.direction,
                     international=f.international,
                     cost_usd=f.cost_usd,
+                    buffer_min=f.buffer_min,
+                    transfer_min=f.transfer_min,
                 )
                 for f in trip.flights
             ],
@@ -112,6 +115,8 @@ def seed_demo(session: Session) -> None:
     )
     session.flush()
 
+    arrivals = {f.date for f in trip.flights if f.direction == "arrive"}
+    departures = {f.date for f in trip.flights if f.direction == "depart"}
     for d in trip.days:
         session.add(
             models.Day(
@@ -121,6 +126,9 @@ def seed_demo(session: Session) -> None:
                 title=d.title,
                 note=d.note,
                 stay_id=d.stay_id,
+                # The sample's hours are the ones chosen, except where a flight sets them.
+                preferred_start_min=DEFAULT_START_MIN if d.date in arrivals else d.start_min,
+                preferred_end_min=DEFAULT_END_MIN if d.date in departures else d.end_min,
                 start_min=d.start_min,
                 end_min=d.end_min,
                 start_rows=[r.model_dump(by_alias=True) for r in d.start_rows],

@@ -45,6 +45,19 @@ The browser's timeline (`frontend/src/domain/timeline.ts`) and the optimizer (`b
 
 The straight-line leg estimate exists in both languages with the same constants, and both test suites check the same two example legs.
 
+### Trip setup and day hours
+
+Days are worked out from flights, hotels and the hours you chose, by `backend/src/pinpoint/setup/days.py`. Only the server does this. The Trip setup page sends one change at a time to `POST /api/trips/{id}/setup` and shows the trip that comes back.
+
+- `days.preferred_start_min` and `preferred_end_min` hold the hours you chose. `start_min`, `end_min`, the fixed rows, the hotel and the note are derived, and only `sync_days` writes them.
+- The trip runs from the arrival flight to the departure flight. Without a flight, it runs from the first check-in or to the last check-out.
+- Arrival day starts at landing + buffer + time to the hotel. Departure day ends at take-off - time at the airport - time to the airport.
+- `flights.transfer_min` is the time between the airport and the hotel, set per flight and 60 minutes when blank. The straight-line estimate can't be used: it treats Kansai to Kyoto (75 km) as city transit and gives over 4 hours. Airport transfers will fill this from Google Routes.
+- When new dates add days, they are titled "Day in <city>". When new dates remove days, their stops go to the backlog with "Its day is no longer on the trip."
+- The server refuses overlapping hotels, check-out before check-in, two arrival or two departure flights on one date, and trips over 60 days. Each refusal leaves the trip unchanged.
+- Adding a hotel waits for place search, which needs the Google key. Editing a hotel's dates, times and cost works now.
+- `backend/tests/test_setup.py` checks that the sample trip's days are exactly what its flights and hotels give.
+
 ## Airport transfers
 
 | Table | Columns |

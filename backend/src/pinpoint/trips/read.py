@@ -120,6 +120,8 @@ def load_trip(session: Session, trip_id: str) -> schemas.Trip:
                 direction=f.direction,
                 international=f.international,
                 cost_usd=_money(f.cost_usd),
+                buffer_min=f.buffer_min,
+                transfer_min=f.transfer_min,
             )
             for f in trip.flights
         ],

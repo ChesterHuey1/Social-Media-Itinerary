@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { Trip } from '../domain/types';
 import type { TripEdit } from '../domain/tripEdits';
-import type { BuildResult, NewExpense, OptimizeResult } from './api';
+import type { BuildResult, NewExpense, OptimizeResult, SetupChange } from './api';
 
 type TripContextValue = {
   trip: Trip;
@@ -13,6 +13,8 @@ type TripContextValue = {
   /** Saves an expense; the server converts it to dollars. Rejects with the server's reason. */
   addExpense: (expense: NewExpense) => Promise<void>;
   removeExpense: (expenseId: string) => Promise<void>;
+  /** Saves a Trip setup change; the server works the days out again. Rejects with the server's reason. */
+  setup: (change: SetupChange) => Promise<void>;
   /** True when the last save failed and the screen was reset to the stored trip. */
   saveError: boolean;
 };

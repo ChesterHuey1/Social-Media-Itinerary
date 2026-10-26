@@ -141,6 +141,10 @@ class Flight(Schema):
     direction: Literal["arrive", "depart"]
     international: bool
     cost_usd: float | None
+    # Null uses the default: 90 or 60 minutes after landing, 3 or 2 hours before take-off.
+    buffer_min: int | None = None
+    # Minutes between the airport and the hotel. Null uses 60.
+    transfer_min: int | None = None
 
 
 class BacklogItem(Schema):
@@ -312,3 +316,47 @@ class OptimizeResult(Schema):
     # The day before optimizing, for Undo.
     previous_stops: list[Stop]
     dropped: list[DroppedStop]
+
+
+# Trip setup. Each change is saved on its own, then the server works the days out again (setup/days.py).
+
+Minute = Annotated[int, Field(ge=0, lt=24 * 60)]
+
+
+class SetTripDetails(Schema):
+    type: Literal["setTripDetails"]
+    name: str = Field(min_length=1, max_length=120)
+    travelers: int = Field(ge=1, le=50)
+    budget_usd: float = Field(ge=0)
+
+
+class SetDayHours(Schema):
+    type: Literal["setDayHours"]
+    day_number: int
+    start_min: Minute
+    end_min: Minute
+
+
+class SaveFlight(Schema):
+    """Adds the flight, or replaces the one with the same id."""
+
+    type: Literal["saveFlight"]
+    flight: Flight
+
+
+class RemoveFlight(Schema):
+    type: Literal["removeFlight"]
+    flight_id: str
+
+
+class SaveStay(Schema):
+    """Changes a hotel's dates, times or cost. Adding a hotel needs place search, which comes with the Google key."""
+
+    type: Literal["saveStay"]
+    stay: Stay
+
+
+SetupChange = Annotated[
+    SetTripDetails | SetDayHours | SaveFlight | RemoveFlight | SaveStay,
+    Field(discriminator="type"),
+]

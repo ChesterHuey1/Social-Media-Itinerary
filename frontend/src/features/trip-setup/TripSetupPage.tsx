@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { formatClock, formatDate, formatDateRange, formatUsd } from '../../domain/format';
+import { formatDate, formatDateRange, parseTimeInput, toTimeInput } from '../../domain/format';
 import type { Day, Trip } from '../../domain/types';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
@@ -11,6 +11,7 @@ import { useTrip } from '../../state/tripContext';
 import { BookingsSection } from './BookingsSection';
 import { SavedPlacesSection } from './SavedPlacesSection';
 import s from './TripSetup.module.css';
+import { useSave } from './useSave';
 
 export function TripSetupPage() {
   const { trip, build } = useTrip();
@@ -87,6 +88,17 @@ function nightsByCity(trip: Trip): string {
 }
 
 function TripDetailsSection({ trip }: { trip: Trip }) {
+  const { save, saving, error } = useSave();
+  const [name, setName] = useState(trip.name);
+  const [travelers, setTravelers] = useState(String(trip.travelers));
+  const [budget, setBudget] = useState(String(trip.budgetUsd));
+  const changed = name !== trip.name || Number(travelers) !== trip.travelers || Number(budget) !== trip.budgetUsd;
+
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    save({ type: 'setTripDetails', name, travelers: Number(travelers), budgetUsd: Number(budget) });
+  };
+
   return (
     <section className={s.section} aria-labelledby="step-2">
       <div className={s.sectionHead}>
@@ -95,32 +107,52 @@ function TripDetailsSection({ trip }: { trip: Trip }) {
           Trip details
         </h2>
       </div>
-      <div className={s.grid2}>
-        <TextField label="Trip name" defaultValue={trip.name} />
-        <div className={ui.field}>
-          <span className={ui.fieldLabel}>Dates and cities</span>
-          <div className={s.derived}>
-            <span>
-              {formatDateRange(trip.startDate, trip.endDate)} · {trip.days.length} days
-            </span>
-            <span className={ui.help}>From your flights and hotels: {nightsByCity(trip)}</span>
+      <form className={s.stack} onSubmit={submit} aria-label="Trip details">
+        <div className={s.grid2}>
+          <TextField label="Trip name" required value={name} onChange={(e) => setName(e.target.value)} />
+          <div className={ui.field}>
+            <span className={ui.fieldLabel}>Dates and cities</span>
+            <div className={s.derived}>
+              <span>
+                {formatDateRange(trip.startDate, trip.endDate)} · {trip.days.length} days
+              </span>
+              <span className={ui.help}>From your flights and hotels: {nightsByCity(trip)}</span>
+            </div>
           </div>
+          <TextField
+            label="Travelers"
+            type="number"
+            min={1}
+            max={50}
+            required
+            value={travelers}
+            onChange={(e) => setTravelers(e.target.value)}
+          />
+          <TextField
+            label="Total budget (USD)"
+            inputMode="decimal"
+            pattern="[0-9]*[.]?[0-9]{0,2}"
+            required
+            value={budget}
+            onChange={(e) => setBudget(e.target.value)}
+          />
         </div>
-        <TextField
-          label="Travelers"
-          type="number"
-          min={1}
-          defaultValue={trip.travelers}
-        />
-        <TextField
-          label="Total budget (USD)"
-          defaultValue={formatUsd(trip.budgetUsd)}
-        />
-      </div>
+        {error && (
+          <p className={s.formError} role="alert">
+            {error}
+          </p>
+        )}
+        <div className={s.formActions}>
+          <Button type="submit" disabled={saving || !changed}>
+            {saving ? 'Saving…' : changed ? 'Save details' : 'Saved'}
+          </Button>
+        </div>
+      </form>
     </section>
   );
 }
 
+/** Which ends of the day a flight sets. Those come from the flight and aren't edited here. */
 function flightSets(trip: Trip, day: Day): { start: boolean; end: boolean } {
   return {
     start: trip.flights.some((f) => f.direction === 'arrive' && f.date === day.date),
@@ -139,33 +171,59 @@ function DayHoursSection({ trip }: { trip: Trip }) {
         <p className={s.muted}>When you want to leave the hotel and be back. Flight days are set for you.</p>
       </div>
       <div className={s.stack}>
-        {trip.days.map((day) => {
-          const fromFlight = flightSets(trip, day);
-          return (
-            <div key={day.number} className={s.dayRow}>
-              <span className={s.dayLabel}>
-                <span className={s.dayName}>Day {day.number}</span>
-                <span className={s.dayDate}>{formatDate(day.date)}</span>
-              </span>
-              <input
-                aria-label={`Day ${day.number} start`}
-                className={cx(ui.input, ui.inputTime, fromFlight.start && ui.inputDerived)}
-                defaultValue={formatClock(day.startMin)}
-              />
-              <input
-                aria-label={`Day ${day.number} end`}
-                className={cx(ui.input, ui.inputTime, fromFlight.end && ui.inputDerived)}
-                defaultValue={formatClock(day.endMin)}
-              />
-              <span className={ui.help}>{day.note}</span>
-            </div>
-          );
-        })}
-      </div>
-      <div className={s.spread}>
-        <span className={s.small}>Buffers: 90 min after landing, 3 h before departure, 10 min per travel leg</span>
-        <Button variant="text">Change buffers</Button>
+        {trip.days.map((day) => (
+          // Keyed by the stored hours, so a saved or refused change resets the inputs to what the server has.
+          <DayHoursRow key={`${day.number} ${day.startMin} ${day.endMin}`} day={day} fromFlight={flightSets(trip, day)} />
+        ))}
       </div>
     </section>
+  );
+}
+
+function DayHoursRow({ day, fromFlight }: { day: Day; fromFlight: { start: boolean; end: boolean } }) {
+  const { save, error } = useSave();
+  const [start, setStart] = useState(toTimeInput(day.startMin));
+  const [end, setEnd] = useState(toTimeInput(day.endMin));
+
+  /** Saves when a time is finished being edited and differs from what's stored. */
+  const commit = () => {
+    const startMin = parseTimeInput(start);
+    const endMin = parseTimeInput(end);
+    if (startMin === null || endMin === null || (startMin === day.startMin && endMin === day.endMin)) return;
+    save({ type: 'setDayHours', dayNumber: day.number, startMin, endMin });
+  };
+
+  return (
+    <div className={s.dayRow}>
+      <span className={s.dayLabel}>
+        <span className={s.dayName}>Day {day.number}</span>
+        <span className={s.dayDate}>{formatDate(day.date)}</span>
+      </span>
+      <input
+        type="time"
+        aria-label={`Day ${day.number} start`}
+        className={cx(ui.input, ui.inputTime, fromFlight.start && ui.inputDerived)}
+        disabled={fromFlight.start}
+        value={start}
+        onChange={(e) => setStart(e.target.value)}
+        onBlur={commit}
+      />
+      <input
+        type="time"
+        aria-label={`Day ${day.number} end`}
+        className={cx(ui.input, ui.inputTime, fromFlight.end && ui.inputDerived)}
+        disabled={fromFlight.end}
+        value={end}
+        onChange={(e) => setEnd(e.target.value)}
+        onBlur={commit}
+      />
+      {error ? (
+        <span className={s.formError} role="alert">
+          {error}
+        </span>
+      ) : (
+        <span className={ui.help}>{day.note}</span>
+      )}
+    </div>
   );
 }

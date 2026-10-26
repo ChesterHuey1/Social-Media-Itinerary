@@ -10,10 +10,12 @@ import {
   loadTrip,
   optimizeDay,
   saveEdit,
+  saveSetup,
   TRIP_ID,
   type BuildResult,
   type NewExpense,
   type OptimizeResult,
+  type SetupChange,
 } from './api';
 import { TripContext } from './tripContext';
 
@@ -94,8 +96,11 @@ export function TripProvider({ children }: { children: ReactNode }) {
 
   const addExpense = (expense: NewExpense) => save(() => saveExpense(TRIP_ID, expense));
   const removeExpense = (expenseId: string) => save(() => deleteExpense(TRIP_ID, expenseId));
+  const setup = (change: SetupChange) => save(() => saveSetup(TRIP_ID, change));
 
   return (
-    <TripContext value={{ trip, edit, optimize, build, addExpense, removeExpense, saveError }}>{children}</TripContext>
+    <TripContext value={{ trip, edit, optimize, build, addExpense, removeExpense, setup, saveError }}>
+      {children}
+    </TripContext>
   );
 }

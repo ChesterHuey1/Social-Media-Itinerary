@@ -100,6 +100,10 @@ export type Flight = {
   direction: 'arrive' | 'depart';
   international: boolean;
   costUsd: number | null;
+  /** Minutes at the airport. Null uses 90 or 60 after landing, 3 h or 2 h before take-off. */
+  bufferMin: number | null;
+  /** Minutes between the airport and the hotel. Null uses 60. */
+  transferMin: number | null;
 };
 
 export type BacklogItem = { placeId: string; reason: string };

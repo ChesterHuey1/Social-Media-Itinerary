@@ -1,5 +1,5 @@
 import type { TripEdit } from '../domain/tripEdits';
-import type { BacklogItem, SpendingCategory, Stop, Trip } from '../domain/types';
+import type { BacklogItem, Flight, SpendingCategory, Stay, Stop, Trip } from '../domain/types';
 
 export type PlanSnapshot = { days: { dayNumber: number; stops: Stop[] }[]; backlog: BacklogItem[] };
 
@@ -79,4 +79,16 @@ export function addExpense(id: string, expense: NewExpense): Promise<Trip> {
 
 export function deleteExpense(id: string, expenseId: string): Promise<Trip> {
   return request('/api/trips/' + id + '/expenses/' + expenseId, { method: 'DELETE' });
+}
+
+/** One Trip setup change. The server saves it, then works the days out again from flights, hotels and hours. */
+export type SetupChange =
+  | { type: 'setTripDetails'; name: string; travelers: number; budgetUsd: number }
+  | { type: 'setDayHours'; dayNumber: number; startMin: number; endMin: number }
+  | { type: 'saveFlight'; flight: Flight }
+  | { type: 'removeFlight'; flightId: string }
+  | { type: 'saveStay'; stay: Stay };
+
+export function saveSetup(id: string, change: SetupChange): Promise<Trip> {
+  return request('/api/trips/' + id + '/setup', { method: 'POST', body: JSON.stringify(change) });
 }

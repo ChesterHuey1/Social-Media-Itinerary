@@ -17,8 +17,8 @@ const WIDTHS = [
   { name: 'phone', width: 390, height: 844 },
 ];
 // '#signed-out' answers the session check with 401, so the sign-in screen shows.
-// '#add-expense' opens the expense form in the budget panel.
-const PAGES = ['/trip/day/1', '/trip/day/1#add-expense', '/trip/day/2', '/trip/day/4', '/setup', '/setup#signed-out'];
+// '#add-expense' opens the expense form in the budget panel; '#add-flight' opens the flight form.
+const PAGES = ['/trip/day/1', '/trip/day/1#add-expense', '/trip/day/2', '/trip/day/4', '/setup', '/setup#add-flight', '/setup#signed-out'];
 const TOLERANCE_PX = 1;
 // The API is answered with the backend's seed file, so this test needs no database.
 const SEED = JSON.parse(readFileSync(new URL('../../backend/src/pinpoint/seed/demo_trip.json', import.meta.url), 'utf8'));
@@ -45,6 +45,7 @@ try {
         await page.getByLabel('Amount').fill('3200');
         await page.getByText('at the Oct 23 rate').waitFor();
       }
+      if (path.endsWith('#add-flight')) await page.getByRole('button', { name: 'Add a flight' }).click();
       const where = `${size.name} ${path}`;
 
       const offScale = await page.evaluate((scale) => {
