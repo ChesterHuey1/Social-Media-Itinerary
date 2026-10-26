@@ -4,7 +4,7 @@ import { formatClock, formatDate, formatDateRange, formatUsd } from '../../domai
 import type { Day, Trip } from '../../domain/types';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
-import { SmallLabel, TextField } from '../../ui/Field';
+import { TextField } from '../../ui/Field';
 import ui from '../../ui/ui.module.css';
 import { useTrip } from '../../state/tripContext';
 import { BookingsSection } from './BookingsSection';
@@ -30,7 +30,6 @@ export function TripSetupPage() {
     <div className={s.page}>
       <main className={s.main}>
         <header className={s.intro}>
-          <SmallLabel>New trip</SmallLabel>
           <h1 className={s.screenTitle}>Plan a trip</h1>
           <p className={s.muted}>
             Add your flights and hotels first. They decide when each day can start, where it begins and ends, and which
@@ -70,7 +69,7 @@ function TripDetailsSection({ trip }: { trip: Trip }) {
   return (
     <section className={s.section} aria-labelledby="step-2">
       <div className={s.sectionHead}>
-        <SmallLabel>Step 2</SmallLabel>
+        <span className={s.step}>2</span>
         <h2 id="step-2" className={s.sectionTitle}>
           Trip details
         </h2>
@@ -112,7 +111,7 @@ function DayHoursSection({ trip }: { trip: Trip }) {
   return (
     <section className={s.section} aria-labelledby="step-3">
       <div className={s.sectionHead}>
-        <SmallLabel>Step 3</SmallLabel>
+        <span className={s.step}>3</span>
         <h2 id="step-3" className={s.sectionTitle}>
           Day hours
         </h2>

@@ -11,7 +11,7 @@ export type TripEdit =
   | { type: 'moveToBacklog'; dayNumber: number; stopId: string }
   | { type: 'addFromBacklog'; dayNumber: number; placeId: string; stopId: string };
 
-const STOP_COLOR_CYCLE: StopColor[] = ['orange', 'slate', 'moss', 'ink'];
+const STOP_COLOR_CYCLE: StopColor[] = ['green', 'blue', 'amber', 'ink'];
 
 function updateDay(trip: Trip, dayNumber: number, change: (day: Day) => Day): Trip {
   return { ...trip, days: trip.days.map((d) => (d.number === dayNumber ? change(d) : d)) };

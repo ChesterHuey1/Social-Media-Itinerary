@@ -13,7 +13,7 @@ function place(id: string, hours: Hours): Place {
 
 export function stop(id: string, placeId: string, minutes: number, lockedAtMin: number | null = null): Stop {
   return {
-    id, placeId, title: null, color: 'orange', objectives: ['explore'],
+    id, placeId, title: null, color: 'amber', objectives: ['explore'],
     stay: { minutes, source: 'estimate' }, lockedAtMin, comments: [],
   };
 }

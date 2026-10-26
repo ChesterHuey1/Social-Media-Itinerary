@@ -33,7 +33,7 @@ export function SavedPlacesSection({ trip, included, onToggle }: SavedPlacesProp
   return (
     <section className={s.section} aria-labelledby="step-4">
       <div className={s.sectionHead}>
-        <SmallLabel>Step 4</SmallLabel>
+        <span className={s.step}>4</span>
         <h2 id="step-4" className={s.sectionTitle}>
           Saved places
         </h2>

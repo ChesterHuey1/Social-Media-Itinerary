@@ -1,48 +1,56 @@
 /* Layout: sidebar 20%, center 45%, map 35% at 1280 px and up.
-   Shapes follow Wanderlog: flat rows on one sheet, pill buttons, no boxed cards. */
+   Every block is a white card with a soft shadow on the pale page. No outlines. */
 .page {
   display: grid;
   grid-template-columns: minmax(264px, 20fr) minmax(520px, 45fr) minmax(400px, 35fr);
   min-height: 100vh;
+  background: var(--page);
+}
+
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.softCard {
+  background: var(--surface-alt);
+  border-radius: var(--radius-card);
 }
 
 /* ---------- Sidebar ---------- */
 .sidebar {
-  background: var(--stone-dark);
-  padding: var(--s24);
+  background: var(--surface);
+  box-shadow: 1px 0 0 var(--line);
+  padding: var(--s24) var(--s16) var(--s32);
   display: flex;
   flex-direction: column;
-  gap: var(--s32);
+  gap: var(--s24);
   min-width: 0;
 }
-.group {
+.tripGroup {
+  padding: 0 var(--s12);
   display: flex;
   flex-direction: column;
-  gap: var(--s8);
+  gap: var(--s4);
 }
 .tripName {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 36px;
-  line-height: 1.05;
+  font-weight: 500;
+  font-size: 28px;
+  line-height: 1.15;
 }
 .meta {
   font-size: 14px;
   color: var(--muted);
 }
-.stay {
-  display: flex;
-  gap: var(--s8);
-  align-items: center;
-  font-size: 14px;
-}
 .editTrip {
+  align-self: flex-start;
   min-height: 44px;
   display: inline-flex;
   align-items: center;
   font-size: 14px;
   font-weight: 600;
-  color: var(--ink);
+  color: var(--accent-text);
   text-decoration: none;
 }
 .editTrip:hover {
@@ -55,63 +63,60 @@
 }
 .dayRow {
   height: 48px;
-  padding: 0 var(--s16);
-  border-radius: 999px;
+  padding: 0 var(--s12);
+  border-radius: var(--radius-control);
   color: var(--ink);
   text-decoration: none;
-  display: flex;
+  font-size: 14px;
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--s8);
   transition: background var(--ease);
 }
 .dayRow:hover {
-  background: var(--paper);
+  background: var(--page);
 }
 .dayRowActive,
 .dayRowActive:hover {
-  background: var(--orange);
-  color: var(--white);
-}
-.dayRowText {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s8);
-  min-width: 0;
-}
-.dayName {
+  background: var(--accent-soft);
+  color: var(--accent-text);
   font-weight: 600;
 }
-.dayDate {
-  font-size: 14px;
+.dayNum {
+  font-weight: 700;
   color: var(--muted);
-  white-space: nowrap;
+}
+.dayRowActive .dayNum {
+  color: var(--accent-text);
 }
 .dayCount {
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 400;
   color: var(--muted);
   white-space: nowrap;
 }
-.dayRowActive .dayDate,
 .dayRowActive .dayCount {
-  color: var(--white);
+  color: var(--accent-text);
 }
 .backlogRow {
+  margin-top: var(--s8);
   font-weight: 600;
 }
 .pill {
-  min-width: 28px;
+  min-width: 24px;
   height: 24px;
   padding: 0 var(--s8);
-  border-radius: 999px;
-  background: var(--paper);
+  border-radius: var(--radius-tag);
+  background: var(--page);
   font-size: 13px;
+  font-weight: 600;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
 
 .budget {
+  padding: var(--s20);
   display: flex;
   flex-direction: column;
   gap: var(--s12);
@@ -124,23 +129,28 @@
 }
 .budgetNumber {
   font-family: var(--font-display);
-  font-size: 40px;
+  font-weight: 500;
+  font-size: 32px;
   line-height: 1;
 }
 .bar {
   height: 8px;
-  border-radius: 999px;
+  border-radius: var(--radius-tag);
   background: var(--line);
   overflow: hidden;
 }
 .barFill {
   height: 100%;
-  background: var(--orange);
+  border-radius: var(--radius-tag);
+  background: var(--accent);
+}
+.barOver {
+  background: var(--warn);
 }
 .categories {
   display: flex;
   flex-direction: column;
-  gap: var(--s8);
+  gap: var(--s4);
   font-size: 14px;
 }
 .category {
@@ -160,33 +170,33 @@
 .viewTab {
   flex: 1;
   height: 44px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: var(--white);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--surface);
+  box-shadow: var(--shadow-card);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
 }
 .viewTabActive {
-  border-color: var(--ink);
-  background: var(--ink);
-  color: var(--white);
+  background: var(--accent);
+  color: var(--surface);
 }
 
-/* ---------- Center column: one paper sheet ---------- */
+/* ---------- Center column ---------- */
 .center {
-  background: var(--paper);
-  padding: var(--s32);
+  padding: var(--s32) var(--s32) var(--s64);
   display: flex;
   flex-direction: column;
   gap: var(--s24);
   min-width: 0;
 }
 .banner {
-  background: var(--orange-soft);
-  color: var(--orange-text);
-  border-radius: 16px;
+  background: var(--warn-soft);
+  color: var(--warn-text);
+  border-radius: var(--radius-control);
   padding: var(--s12) var(--s16);
+  font-size: 14px;
   display: flex;
   align-items: center;
   gap: var(--s12);
@@ -199,7 +209,7 @@
   display: inline-flex;
   align-items: center;
   font-weight: 600;
-  color: var(--orange-text);
+  color: inherit;
 }
 .header {
   display: flex;
@@ -215,15 +225,15 @@
   min-width: 0;
 }
 .dayKicker {
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 600;
   color: var(--muted);
 }
 .dayTitle {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 48px;
-  line-height: 1.05;
+  font-weight: 500;
+  font-size: 40px;
+  line-height: 1.1;
 }
 .dayTotal {
   font-size: 15px;
@@ -242,46 +252,34 @@
   display: none;
 }
 
+/* ---------- Stop list ---------- */
 .list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--s8);
-}
-.row {
-  display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  column-gap: var(--s16);
-  align-items: start;
-}
-.rowCenter {
-  align-items: center;
-}
-.time {
-  font-size: 14px;
-  font-weight: 600;
-  padding-top: 4px;
-}
-.rowCenter .time {
-  padding-top: 0;
 }
 .fixedRow {
-  min-height: 44px;
+  padding: var(--s12) var(--s16);
   display: flex;
   align-items: center;
   gap: var(--s12);
   font-weight: 600;
 }
+.fixedTime {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--muted);
+}
 .hBadge {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
-  background: var(--ink);
-  color: var(--white);
+  border-radius: var(--radius-tag);
+  background: var(--stop-ink);
+  color: var(--surface);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -295,12 +293,14 @@
   text-overflow: ellipsis;
 }
 
-/* Travel leg: tiny text centered on a dashed line, Wanderlog style. */
+/* Travel leg between two cards: centered text between short dotted lines.
+   Its space above and below is equal; the layout test checks that. */
 .leg {
+  padding: var(--s8) 0;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: var(--s8);
-  padding: var(--s4) 0;
   font-size: 13px;
   color: var(--muted);
   white-space: nowrap;
@@ -309,20 +309,19 @@
 .leg::after {
   content: '';
   flex: 1;
-  border-top: 1.5px dashed var(--line);
-}
-.leg::before {
-  flex: 0 0 72px;
+  max-width: 64px;
+  border-top: 1.5px dotted var(--faint);
 }
 
-/* A stop is a flat row, not a boxed card. */
 .stop {
+  padding: var(--s16) var(--s16) var(--s20);
   display: flex;
   flex-direction: column;
-  gap: var(--s8);
-  padding: var(--s4) 0;
-  border-radius: 12px;
-  background: var(--paper);
+  gap: var(--s12);
+  transition: box-shadow var(--ease);
+}
+.stop:hover {
+  box-shadow: var(--shadow-lift);
 }
 .stopHead {
   display: flex;
@@ -330,12 +329,12 @@
   gap: var(--s12);
 }
 .handle {
-  width: 24px;
+  width: 12px;
   height: 28px;
   padding: 0;
   border: 0;
   background: none;
-  color: var(--muted);
+  color: var(--faint);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -348,25 +347,28 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  color: var(--white);
+  color: var(--surface);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 700;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: none;
 }
-.stopName {
+.stopTitle {
   flex: 1;
   min-width: 0;
-  font-size: 18px;
-  font-weight: 600;
-  line-height: 1.25;
+  display: flex;
+  flex-direction: column;
+}
+.stopName {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.3;
 }
 .range {
   font-size: 14px;
   color: var(--muted);
-  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: var(--s4);
@@ -376,10 +378,10 @@
   gap: var(--s4);
 }
 .iconButton {
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   border: 0;
-  border-radius: 999px;
+  border-radius: 10px;
   background: transparent;
   color: var(--muted);
   display: flex;
@@ -388,20 +390,24 @@
   cursor: pointer;
   transition: background var(--ease), color var(--ease);
 }
-.iconButton:hover {
-  background: var(--neutral-tint);
+.iconButton:hover:not(:disabled) {
+  background: var(--hover);
   color: var(--ink);
+}
+.iconButton:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 .iconButtonOn {
-  color: var(--ink);
+  color: var(--accent-text);
 }
-.iconButtonAccent:hover {
-  background: var(--orange-soft);
-  color: var(--orange-text);
+.iconButtonAccent:hover:not(:disabled) {
+  background: var(--warn-soft);
+  color: var(--warn-text);
 }
-/* 64 px = handle 24 + gap 12 + badge 28, so the body lines up under the name. */
+/* 64 px = handle 12 + gap 12 + badge 28 + gap 12, so the body lines up under the name. */
 .stopBody {
-  padding-left: 64px;
+  padding-left: var(--s64);
   display: flex;
   flex-direction: column;
   gap: var(--s8);
@@ -415,24 +421,28 @@
   margin: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: var(--s4) var(--s24);
-  font-size: 14px;
+  gap: var(--s4) var(--s20);
+  font-size: 13px;
+  color: var(--muted);
 }
 .details div {
   display: flex;
-  gap: var(--s8);
+  gap: var(--s4);
 }
 .details dt {
   font-weight: 600;
+  color: var(--ink);
 }
 .details dd {
   margin: 0;
 }
 .alert {
-  background: var(--orange-soft);
-  color: var(--orange-text);
-  border-radius: 16px;
-  padding: var(--s8) var(--s8) var(--s8) var(--s16);
+  background: var(--warn-soft);
+  color: var(--warn-text);
+  border-radius: 10px;
+  padding: var(--s8) var(--s8) var(--s8) var(--s12);
+  font-size: 14px;
+  font-weight: 600;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -443,8 +453,8 @@
   min-width: 180px;
 }
 .comment {
-  background: var(--stone);
-  border-radius: 12px;
+  background: var(--surface-alt);
+  border-radius: 10px;
   padding: var(--s8) var(--s12);
   font-size: 14px;
 }
@@ -453,20 +463,19 @@
   margin-right: var(--s8);
 }
 
-/* A dragged stop lifts; the others slide aside (dnd-kit transition, 200 ms). */
+/* A dragged card lifts; the others slide aside (dnd-kit transition, 200 ms). */
 .sortable {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--s8);
 }
 .lifted {
   z-index: 2;
 }
 .lifted .stop {
-  box-shadow: 0 2px 8px rgba(34, 32, 28, 0.18);
+  box-shadow: var(--shadow-lift);
 }
-/* Legs describe the old order while a stop is dragged. Hide them without changing the layout,
+/* Legs describe the old order while a card is dragged. Hide them without changing the layout,
    so the positions dnd-kit measured at drag start stay true. */
 .dragging .leg {
   visibility: hidden;
@@ -474,27 +483,30 @@
 
 .dayAlert {
   list-style: none;
+  margin-top: var(--s8);
 }
-.openTime,
-.empty {
-  background: var(--stone);
-  border-radius: 16px;
+.openTime {
+  margin-top: var(--s16);
   padding: var(--s16) var(--s20);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: var(--s12);
+  gap: var(--s8) var(--s16);
 }
 .empty {
   list-style: none;
-  flex-direction: column;
+  margin: var(--s16) 0;
   padding: var(--s48) var(--s24);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--s16);
   text-align: center;
 }
 .emptyTitle {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
 }
 .picker {
   flex-basis: 100%;
@@ -511,7 +523,7 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--s16);
-  border-top: 1px solid var(--line);
+  box-shadow: inset 0 1px 0 var(--line-soft);
 }
 .small {
   font-size: 14px;
@@ -521,20 +533,19 @@
   font-weight: 600;
 }
 
-/* ---------- Day breakdown, after the last stop ---------- */
+/* ---------- Day breakdown ---------- */
 .breakdown {
-  border-top: 1px solid var(--line);
-  padding-top: var(--s24);
+  padding: var(--s24);
   display: flex;
   flex-direction: column;
-  gap: var(--s12);
 }
 .breakdownTitle,
 .sectionTitle {
-  font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 1.1;
+  font-size: 17px;
+  font-weight: 700;
+}
+.breakdownTitle {
+  margin-bottom: var(--s8);
 }
 .breakdownList {
   margin: 0;
@@ -546,7 +557,9 @@
   justify-content: space-between;
   gap: var(--s16);
   padding: var(--s8) 0;
-  border-bottom: 1px solid var(--line);
+}
+.breakdownRow + .breakdownRow {
+  box-shadow: inset 0 1px 0 var(--line-soft);
 }
 .breakdownRow dt {
   color: var(--muted);
@@ -556,18 +569,15 @@
   text-align: right;
 }
 .breakdownTotal {
-  border-bottom: 0;
-  font-weight: 600;
-  font-size: 18px;
+  font-weight: 700;
+  font-size: 17px;
 }
 .breakdownTotal dt {
   color: var(--ink);
 }
 
-/* ---------- Backlog: flat rows ---------- */
+/* ---------- Backlog ---------- */
 .section {
-  border-top: 1px solid var(--line);
-  padding: var(--s24) 0 var(--s48);
   display: flex;
   flex-direction: column;
   gap: var(--s12);
@@ -581,16 +591,18 @@
 .backlogList {
   list-style: none;
   margin: 0;
-  padding: 0;
+  padding: var(--s4) var(--s20);
   display: flex;
   flex-direction: column;
 }
-.backlogRow2 {
+.backlogItem {
   display: flex;
   align-items: center;
   gap: var(--s16);
   padding: var(--s12) 0;
-  border-bottom: 1px solid var(--line);
+}
+.backlogItem + .backlogItem {
+  box-shadow: inset 0 1px 0 var(--line-soft);
 }
 .backlogText {
   flex: 1;
@@ -619,8 +631,6 @@
   position: absolute;
   left: var(--s24);
   top: var(--s24);
-  background: var(--paper);
-  border-radius: 16px;
   padding: var(--s12) var(--s16);
   display: flex;
   flex-direction: column;
@@ -643,8 +653,6 @@
 .zoom {
   display: flex;
   flex-direction: column;
-  background: var(--paper);
-  border-radius: 999px;
   overflow: hidden;
 }
 .zoomBtn {
@@ -658,12 +666,7 @@
   cursor: pointer;
 }
 .zoomBtn:hover {
-  background: var(--white);
-}
-.zoomDivider {
-  height: 1px;
-  margin: 0 var(--s8);
-  background: var(--line);
+  background: var(--page);
 }
 .closeMap {
   display: none;
@@ -673,30 +676,27 @@
   left: var(--s24);
   right: var(--s24);
   bottom: var(--s24);
-  background: var(--paper);
-  border-radius: 16px;
-  padding: var(--s4) var(--s16);
+  padding: var(--s8) var(--s8) var(--s8) var(--s16);
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--s8) var(--s16);
+  gap: var(--s4) var(--s16);
   font-size: 14px;
 }
 .ok {
+  flex: 1;
   display: inline-flex;
   align-items: center;
   gap: var(--s8);
-  color: var(--moss-text);
+  color: var(--accent-text);
 }
 .warn {
+  flex: 1;
   display: inline-flex;
   align-items: center;
   gap: var(--s8);
-  color: var(--orange-text);
+  color: var(--warn-text);
   font-weight: 600;
-}
-.mapsLink {
-  margin-left: auto;
 }
 
 /* ---------- Side panel: covers the map column exactly ---------- */
@@ -716,9 +716,9 @@
   width: 35%;
   min-width: 400px;
   z-index: 20;
-  background: var(--paper);
-  border-radius: 24px 0 0 24px;
-  box-shadow: -4px 0 24px rgba(34, 32, 28, 0.12);
+  background: var(--surface);
+  border-radius: 20px 0 0 20px;
+  box-shadow: -8px 0 32px rgba(16, 40, 28, 0.1);
   display: flex;
   flex-direction: column;
   animation: slideIn 200ms ease-out;
@@ -744,11 +744,29 @@
   justify-content: space-between;
   gap: var(--s16);
 }
+.panelTitleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--s12);
+  min-width: 0;
+}
 .panelTitle {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: 32px;
-  line-height: 1.1;
+  font-weight: 500;
+  font-size: 24px;
+  line-height: 1.2;
+}
+.closeButton {
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--page);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: none;
 }
 .fieldset {
   border: 0;
@@ -766,21 +784,21 @@
 }
 .swatches {
   display: flex;
-  gap: var(--s8);
+  gap: var(--s12);
 }
 .swatch {
   width: 44px;
   height: 44px;
   border: 0;
   border-radius: 50%;
-  color: var(--white);
+  color: var(--surface);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
 }
 .swatchOn {
-  box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--ink);
+  box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--ink);
 }
 .inline {
   display: flex;
@@ -789,6 +807,17 @@
 }
 .numberField {
   width: 96px;
+}
+.timeField {
+  width: 160px;
+}
+.lockRow {
+  padding: var(--s16);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--s12) var(--s16);
 }
 .checkRow {
   display: flex;
@@ -802,15 +831,11 @@
   width: 20px;
   height: 20px;
   margin: 0;
-  accent-color: var(--ink);
-}
-.divider {
-  height: 1px;
-  background: var(--line);
+  accent-color: var(--accent);
 }
 .panelFoot {
   padding: var(--s20) var(--s32) var(--s32);
-  border-top: 1px solid var(--line);
+  box-shadow: 0 -1px 0 var(--line-soft);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -819,7 +844,7 @@
 .panelFootRight {
   display: flex;
   align-items: center;
-  gap: var(--s16);
+  gap: var(--s8);
 }
 
 /* ---------- 1024 to 1279 px: map becomes a 50% overlay ---------- */
@@ -862,6 +887,7 @@
   .sidebar {
     padding: var(--s16);
     gap: var(--s16);
+    box-shadow: 0 1px 0 var(--line);
   }
   .tripGroup,
   .daysLabel {
@@ -873,6 +899,7 @@
   }
   .dayRow {
     flex: none;
+    grid-template-columns: auto;
   }
   .dayDate,
   .dayCount {
@@ -899,23 +926,16 @@
     display: none;
   }
   .center {
-    padding: var(--s16);
+    padding: var(--s16) var(--s16) var(--s48);
   }
   .dayTitle {
-    font-size: 36px;
-  }
-  .row {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: var(--s4);
-  }
-  .time {
-    padding-top: 0;
+    font-size: 32px;
   }
   .stopBody {
     padding-left: 0;
   }
-  .leg::before {
-    flex: 0 0 16px;
+  .iconActions .iconButton {
+    width: 36px;
   }
   .panel {
     width: 100%;

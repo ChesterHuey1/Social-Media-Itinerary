@@ -49,7 +49,7 @@ export function DayBreakdown({ summary }: { summary: DaySummary }) {
     { label: 'Transit', value: summary.transitUsd },
   ];
   return (
-    <section className={s.breakdown} aria-labelledby="breakdown-title">
+    <section className={`${s.card} ${s.breakdown}`} aria-labelledby="breakdown-title">
       <h3 id="breakdown-title" className={s.breakdownTitle}>
         Day breakdown
       </h3>

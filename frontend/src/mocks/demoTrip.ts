@@ -206,11 +206,11 @@ export const demoTrip: Trip = {
       endRows: [{ kind: 'hotel', text: `Check in: ${GINZA_HOTEL}`, atMin: h(21) }],
       stops: [
         {
-          id: 'd1s1', placeId: 'itoya', title: null, color: 'slate', objectives: ['explore'],
+          id: 'd1s1', placeId: 'itoya', title: null, color: 'blue', objectives: ['explore'],
           stay: { minutes: 75, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
         {
-          id: 'd1s2', placeId: 'kagari', title: null, color: 'orange', objectives: ['eat'],
+          id: 'd1s2', placeId: 'kagari', title: null, color: 'amber', objectives: ['eat'],
           stay: { minutes: 45, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
       ],
@@ -222,16 +222,16 @@ export const demoTrip: Trip = {
       endRows: [{ kind: 'hotel', text: `Back at ${GINZA_HOTEL}`, atMin: h(21, 30) }],
       stops: [
         {
-          id: 'd2s1', placeId: 'tsukiji', title: null, color: 'orange', objectives: ['eat', 'explore'],
+          id: 'd2s1', placeId: 'tsukiji', title: null, color: 'amber', objectives: ['eat', 'explore'],
           stay: { minutes: 90, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
         {
-          id: 'd2s2', placeId: 'teamlab', title: null, color: 'slate', objectives: ['experience', 'pictures'],
+          id: 'd2s2', placeId: 'teamlab', title: null, color: 'blue', objectives: ['experience', 'pictures'],
           stay: { minutes: 120, source: 'user' }, lockedAtMin: h(11),
           comments: [{ id: 'c1', body: 'QR tickets are in the confirmation email.', createdAt: '2026-10-20' }],
         },
         {
-          id: 'd2s3', placeId: 'ichiran', title: null, color: 'moss', objectives: ['eat'],
+          id: 'd2s3', placeId: 'ichiran', title: null, color: 'green', objectives: ['eat'],
           stay: { minutes: 45, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
         {
@@ -239,11 +239,11 @@ export const demoTrip: Trip = {
           stay: { minutes: 75, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
         {
-          id: 'd2s5', placeId: 'nonbei', title: null, color: 'orange', objectives: ['experience'],
+          id: 'd2s5', placeId: 'nonbei', title: null, color: 'amber', objectives: ['experience'],
           stay: { minutes: 45, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
         {
-          id: 'd2s6', placeId: 'uobei', title: null, color: 'moss', objectives: ['eat'],
+          id: 'd2s6', placeId: 'uobei', title: null, color: 'green', objectives: ['eat'],
           stay: { minutes: 60, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
       ],
@@ -255,11 +255,11 @@ export const demoTrip: Trip = {
       endRows: [{ kind: 'hotel', text: `Back at ${GINZA_HOTEL}`, atMin: h(21, 30) }],
       stops: [
         {
-          id: 'd3s1', placeId: 'sensoji', title: null, color: 'orange', objectives: ['explore', 'pictures'],
+          id: 'd3s1', placeId: 'sensoji', title: null, color: 'amber', objectives: ['explore', 'pictures'],
           stay: { minutes: 75, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
         {
-          id: 'd3s2', placeId: 'ueno', title: null, color: 'moss', objectives: ['explore'],
+          id: 'd3s2', placeId: 'ueno', title: null, color: 'green', objectives: ['explore'],
           stay: { minutes: 90, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
       ],
@@ -279,15 +279,15 @@ export const demoTrip: Trip = {
       endRows: [{ kind: 'hotel', text: `Back at ${KYOTO_HOTEL}`, atMin: h(21, 30) }],
       stops: [
         {
-          id: 'd5s1', placeId: 'fushimi', title: null, color: 'orange', objectives: ['pictures', 'explore'],
+          id: 'd5s1', placeId: 'fushimi', title: null, color: 'amber', objectives: ['pictures', 'explore'],
           stay: { minutes: 120, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
         {
-          id: 'd5s2', placeId: 'nishiki', title: null, color: 'moss', objectives: ['eat'],
+          id: 'd5s2', placeId: 'nishiki', title: null, color: 'green', objectives: ['eat'],
           stay: { minutes: 60, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
         {
-          id: 'd5s3', placeId: 'kinkakuji', title: null, color: 'slate', objectives: ['pictures'],
+          id: 'd5s3', placeId: 'kinkakuji', title: null, color: 'blue', objectives: ['pictures'],
           stay: { minutes: 75, source: 'estimate' }, lockedAtMin: null, comments: [],
         },
       ],

@@ -22,7 +22,7 @@ describe('applyTripEdit', () => {
       stopId: 's2',
       changes: { title: 'Lunch', stay: { minutes: 90, source: 'user' } },
     });
-    expect(next.days[0].stops[1]).toMatchObject({ title: 'Lunch', color: 'orange', stay: { minutes: 90, source: 'user' } });
+    expect(next.days[0].stops[1]).toMatchObject({ title: 'Lunch', color: 'amber', stay: { minutes: 90, source: 'user' } });
   });
 
   it('adds a trimmed comment and drops an empty one', () => {

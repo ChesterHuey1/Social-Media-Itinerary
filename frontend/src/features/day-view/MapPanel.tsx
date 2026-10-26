@@ -5,7 +5,9 @@ import { nearbyBacklog } from '../../domain/schedule';
 import type { Day, Stay } from '../../domain/types';
 import { useTrip } from '../../state/tripContext';
 import { Button } from '../../ui/Button';
+import { cx } from '../../ui/cx';
 import { Icon } from '../../ui/Icon';
+import ui from '../../ui/ui.module.css';
 import s from './DayView.module.css';
 import { layoutPoints, type MapBox } from './mapLayout';
 import { stopColorValue } from './stopColors';
@@ -49,9 +51,9 @@ export function MapPanel({ day, stay, timeline, onClose }: MapPanelProps) {
             const leg = i < timeline.stops.length ? timeline.stops[i].legBefore : timeline.returnLeg;
             const isReturn = i === route.length - 2;
             const style = isReturn
-              ? { stroke: 'var(--orange)', strokeWidth: 2, strokeDasharray: '1 6' }
+              ? { stroke: 'var(--accent)', strokeWidth: 2, strokeDasharray: '1 6' }
               : leg?.mode === 'transit'
-                ? { stroke: 'var(--orange)', strokeWidth: 4 }
+                ? { stroke: 'var(--accent)', strokeWidth: 4 }
                 : { stroke: 'var(--ink)', strokeWidth: 3, strokeDasharray: '6 5' };
             return (
               <line key={i} x1={from.x} y1={from.y} x2={to.x} y2={to.y} strokeLinecap="round" vectorEffect="non-scaling-stroke" {...style} />
@@ -59,15 +61,15 @@ export function MapPanel({ day, stay, timeline, onClose }: MapPanelProps) {
           })}
 
         {backlogPoints.map((p, i) => (
-          <circle key={backlog[i].id} cx={p.x} cy={p.y} r={9} fill="var(--paper)" stroke="var(--ink)" strokeWidth={2}>
+          <circle key={backlog[i].id} cx={p.x} cy={p.y} r={9} fill="var(--surface)" stroke="var(--ink)" strokeWidth={2}>
             <title>{`${backlog[i].name} (backlog)`}</title>
           </circle>
         ))}
 
         <g>
           <title>{stay.name}</title>
-          <circle cx={hotel.x} cy={hotel.y} r={15} fill="var(--ink)" stroke="var(--paper)" strokeWidth={2} />
-          <text x={hotel.x} y={hotel.y} textAnchor="middle" dominantBaseline="central" fill="var(--white)" fontSize={13} fontWeight={600}>
+          <rect x={hotel.x - 15} y={hotel.y - 15} width={30} height={30} rx={8} fill="var(--stop-ink)" stroke="var(--surface)" strokeWidth={3} />
+          <text x={hotel.x} y={hotel.y} textAnchor="middle" dominantBaseline="central" fill="var(--surface)" fontSize={13} fontWeight={700}>
             H
           </text>
         </g>
@@ -75,27 +77,27 @@ export function MapPanel({ day, stay, timeline, onClose }: MapPanelProps) {
         {stopPoints.map((p, i) => (
           <g key={day.stops[i].id}>
             <title>{`${i + 1}. ${day.stops[i].title ?? stopPlaces[i].name}`}</title>
-            {timeline.stops[i].problem && <circle cx={p.x} cy={p.y} r={19} fill="none" stroke="var(--orange)" strokeWidth={2} />}
-            <circle cx={p.x} cy={p.y} r={15} fill={stopColorValue[day.stops[i].color]} stroke="var(--paper)" strokeWidth={2} />
-            <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fill="var(--white)" fontSize={13} fontWeight={600}>
+            {timeline.stops[i].problem && <circle cx={p.x} cy={p.y} r={19} fill="none" stroke="var(--warn)" strokeWidth={2} />}
+            <circle cx={p.x} cy={p.y} r={15} fill={stopColorValue[day.stops[i].color]} stroke="var(--surface)" strokeWidth={3} />
+            <text x={p.x} y={p.y} textAnchor="middle" dominantBaseline="central" fill="var(--surface)" fontSize={13} fontWeight={700}>
               {i + 1}
             </text>
           </g>
         ))}
       </svg>
 
-      <div className={s.legend}>
+      <div className={cx(s.card, s.legend)}>
         <LegendRow label="Walk">
           <line x1="2" y1="4" x2="22" y2="4" stroke="var(--ink)" strokeWidth="3" strokeDasharray="5 4" strokeLinecap="round" />
         </LegendRow>
         <LegendRow label="Transit">
-          <line x1="2" y1="4" x2="22" y2="4" stroke="var(--orange)" strokeWidth="4" strokeLinecap="round" />
+          <line x1="2" y1="4" x2="22" y2="4" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round" />
         </LegendRow>
         <LegendRow label="Back to hotel">
-          <line x1="2" y1="4" x2="22" y2="4" stroke="var(--orange)" strokeWidth="2" strokeDasharray="1 4" strokeLinecap="round" />
+          <line x1="2" y1="4" x2="22" y2="4" stroke="var(--accent)" strokeWidth="2" strokeDasharray="1 4" strokeLinecap="round" />
         </LegendRow>
         <LegendRow label="Backlog nearby">
-          <circle cx="12" cy="4" r="3.5" fill="var(--paper)" stroke="var(--ink)" strokeWidth="1.5" />
+          <circle cx="12" cy="4" r="3.5" fill="var(--surface)" stroke="var(--ink)" strokeWidth="1.5" />
         </LegendRow>
       </div>
 
@@ -103,11 +105,10 @@ export function MapPanel({ day, stay, timeline, onClose }: MapPanelProps) {
         <Button className={s.closeMap} icon="close" onClick={onClose}>
           Close map
         </Button>
-        <div className={s.zoom}>
+        <div className={cx(s.card, s.zoom)}>
           <button type="button" className={s.zoomBtn} aria-label="Zoom in">
             <Icon name="plus" size={18} />
           </button>
-          <span className={s.zoomDivider} />
           <button type="button" className={s.zoomBtn} aria-label="Zoom out">
             <Icon name="minus" size={18} />
           </button>
@@ -115,7 +116,7 @@ export function MapPanel({ day, stay, timeline, onClose }: MapPanelProps) {
       </div>
 
       {day.stops.length > 0 && (
-        <div className={s.routeCheck}>
+        <div className={cx(s.card, s.routeCheck)}>
           {flagged.length === 0 ? (
             <span className={s.ok}>
               <Icon name="check" />
@@ -128,7 +129,7 @@ export function MapPanel({ day, stay, timeline, onClose }: MapPanelProps) {
             </span>
           )}
           {mapsUrl && (
-            <a className={`${s.bannerLink} ${s.mapsLink}`} href={mapsUrl} target="_blank" rel="noreferrer">
+            <a className={cx(ui.btn, ui.secondary)} href={mapsUrl} target="_blank" rel="noreferrer">
               Open in Google Maps
             </a>
           )}

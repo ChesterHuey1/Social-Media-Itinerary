@@ -1,17 +1,17 @@
 import { useState } from 'react';
-import { parseTimeInput, toTimeInput } from '../../domain/format';
+import { formatRange, parseTimeInput, toTimeInput } from '../../domain/format';
 import { defaultStayMinutes, type TimelineStop } from '../../domain/timeline';
 import type { StopChanges } from '../../domain/tripEdits';
 import type { Objective, StopColor } from '../../domain/types';
 import { useTrip } from '../../state/tripContext';
 import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
-import { SmallLabel, TextArea, TextField } from '../../ui/Field';
+import { TextArea, TextField } from '../../ui/Field';
 import { Icon } from '../../ui/Icon';
 import { OBJECTIVES, objectiveClass } from '../../ui/objectives';
 import ui from '../../ui/ui.module.css';
 import s from './DayView.module.css';
-import { STOP_COLORS } from './stopColors';
+import { STOP_COLORS, stopColorValue } from './stopColors';
 
 type EditStopPanelProps = {
   dayNumber: number;
@@ -86,13 +86,18 @@ export function EditStopPanel({ dayNumber, item, index, stopCount, onClose }: Ed
       >
         <div className={s.panelBody}>
           <div className={s.panelHead}>
-            <div className={s.titleBlock}>
-              <SmallLabel>
-                Day {dayNumber} · Stop {index + 1}
-              </SmallLabel>
-              <h2 className={s.panelTitle}>Edit stop</h2>
+            <div className={s.panelTitleRow}>
+              <span className={s.badge} style={{ background: stopColorValue[color] }}>
+                {index + 1}
+              </span>
+              <div className={s.titleBlock}>
+                <h2 className={s.panelTitle}>{stop.title ?? place.name}</h2>
+                <span className={s.small}>
+                  Day {dayNumber} · {formatRange(item.arriveMin, item.leaveMin)}
+                </span>
+              </div>
             </div>
-            <button type="button" className={s.iconButton} aria-label="Close panel" onClick={onClose}>
+            <button type="button" className={s.closeButton} aria-label="Close panel" onClick={onClose}>
               <Icon name="close" size={18} />
             </button>
           </div>
@@ -169,7 +174,7 @@ export function EditStopPanel({ dayNumber, item, index, stopCount, onClose }: Ed
             </div>
           </fieldset>
 
-          <div className={s.fieldset}>
+          <div className={cx(s.softCard, s.lockRow)}>
             <label className={s.checkRow}>
               <input type="checkbox" className={s.checkbox} checked={locked} onChange={(e) => setLocked(e.target.checked)} />
               Lock arrival time
@@ -178,6 +183,7 @@ export function EditStopPanel({ dayNumber, item, index, stopCount, onClose }: Ed
               label="Arrival time"
               type="time"
               time
+              className={s.timeField}
               disabled={!locked}
               derived={!locked}
               value={lockTime}

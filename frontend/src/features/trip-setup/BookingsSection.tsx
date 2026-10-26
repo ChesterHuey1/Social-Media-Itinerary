@@ -10,7 +10,7 @@ export function BookingsSection({ trip }: { trip: Trip }) {
   return (
     <section className={s.section} aria-labelledby="step-1">
       <div className={s.sectionHead}>
-        <SmallLabel>Step 1</SmallLabel>
+        <span className={s.step}>1</span>
         <h2 id="step-1" className={s.sectionTitle}>
           Flights and hotels
         </h2>

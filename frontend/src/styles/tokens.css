@@ -1,31 +1,57 @@
-/* Design tokens from the UI specification. Components use these, never raw values. */
+/* Design tokens. Components use these by role, never raw values, so a palette change happens here only.
+   Palette: white and green. Accent marks the one next step; warn marks problems only. */
 :root {
-  /* 60% */
-  --stone: #eae7dc;
-  --stone-dark: #dfdacb;
-  /* 30% */
-  --paper: #f7f5ef;
-  --white: #ffffff;
-  --ink: #22201c;
-  --muted: #5e584f;
-  --line: #d3cdbf;
-  /* 10% */
-  --orange: #c2410c;
-  --orange-hover: #a9380a;
-  --orange-soft: #f6dccb;
-  --orange-text: #9a3412;
+  /* Surfaces */
+  --page: #f4f6f3;
+  --surface: #ffffff;
+  --surface-alt: #f8faf7;
+  --hover: #f0f3ef;
 
-  /* Stop colors and their tag tints */
-  --slate: #3e4c8a;
-  --slate-tint: #dfe2f0;
-  --moss: #3f6b4a;
-  --moss-tint: #dce6de;
-  --moss-text: #2f5239;
-  --neutral-tint: #e3ded1;
-  --dash: #b9b1a2;
-  --map-land: #ece8dd;
+  /* Text and lines */
+  --ink: #17221c;
+  --muted: #5b6b62;
+  --faint: #9aa79f;
+  --line: #e3e8e3;
+  --line-soft: #eef1ee;
 
-  /* Spacing scale: only these nine values */
+  /* Accent: primary button, active day, transit lines */
+  --accent: #2f6b4f;
+  --accent-hover: #275a42;
+  --accent-soft: #e3efe7;
+  --accent-text: #1f5139;
+  --focus-ring: #cfe3d6;
+
+  /* Warnings only */
+  --warn: #b4532a;
+  --warn-soft: #fbeadf;
+  --warn-text: #8a3a17;
+
+  /* Stop colors: white text passes 4.5:1 on each */
+  --stop-green: #2f6b4f;
+  --stop-blue: #3b5ba5;
+  --stop-amber: #a15c12;
+  --stop-ink: #17221c;
+
+  /* Tag tints */
+  --tag-eat-bg: #fbefd9;
+  --tag-eat-text: #7a4a0c;
+  --tag-explore-bg: #e3efe7;
+  --tag-explore-text: #1f5139;
+  --tag-experience-bg: #e4eaf6;
+  --tag-experience-text: #2e4a8c;
+  --tag-pictures-bg: #eef1ee;
+
+  /* Map */
+  --map-land: #eef2ec;
+  --map-water: #d6e4e6;
+
+  --shadow-card: 0 1px 2px rgba(16, 40, 28, 0.06), 0 4px 16px rgba(16, 40, 28, 0.05);
+  --shadow-lift: 0 1px 2px rgba(16, 40, 28, 0.08), 0 8px 24px rgba(16, 40, 28, 0.1);
+  --radius-card: 16px;
+  --radius-control: 12px;
+  --radius-tag: 8px;
+
+  /* Spacing scale: only these nine values. `npm run lint` rejects any other. */
   --s4: 4px;
   --s8: 8px;
   --s12: 12px;
@@ -50,7 +76,7 @@
 
 body {
   margin: 0;
-  background: var(--stone);
+  background: var(--page);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 15px;
@@ -71,7 +97,12 @@ textarea {
   color: inherit;
 }
 
+/* The browser default is 1px 6px, which is off the spacing scale. Buttons set their own. */
+button {
+  padding: 0;
+}
+
 :focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px var(--orange-soft), inset 0 0 0 1.5px var(--orange);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 0 5px var(--focus-ring);
 }

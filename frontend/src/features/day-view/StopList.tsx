@@ -43,7 +43,8 @@ export function StopList({ day, timeline, onEditStop }: StopListProps) {
   const moveStop = (fromIndex: number, toIndex: number) => edit({ type: 'moveStop', dayNumber: day.number, fromIndex, toIndex });
 
   const handleDragEnd = ({ active, over }: DragEndEvent) => {
-    setDragging(false);    if (!over || active.id === over.id) return;
+    setDragging(false);
+    if (!over || active.id === over.id) return;
     moveStop(ids.indexOf(String(active.id)), ids.indexOf(String(over.id)));
   };
 
@@ -70,7 +71,10 @@ export function StopList({ day, timeline, onEditStop }: StopListProps) {
               key={item.stop.id}
               item={item}
               number={i + 1}
+              isFirst={i === 0}
               isLast={i === timeline.stops.length - 1}
+              onMoveUp={() => moveStop(i, i - 1)}
+              onMoveDown={() => moveStop(i, i + 1)}
               onEdit={() => onEditStop(item.stop.id)}
               onMoveLater={() => moveStop(i, i + 1)}
               onToggleLock={() =>
@@ -88,8 +92,7 @@ export function StopList({ day, timeline, onEditStop }: StopListProps) {
       </DndContext>
 
       {gap && last && (
-        <li className={s.row}>
-          <div className={s.time}>{formatClock(gap.fromMin)}</div>
+        <li>
           <OpenTimeBlock dayNumber={day.number} fromMin={gap.fromMin} toMin={gap.toMin} near={last.place.location} area={last.place.area} />
         </li>
       )}
@@ -119,8 +122,11 @@ export function StopList({ day, timeline, onEditStop }: StopListProps) {
 type SortableStopProps = {
   item: TimelineStop;
   number: number;
+  isFirst: boolean;
   isLast: boolean;
   onEdit: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
   onMoveLater: () => void;
   onToggleLock: () => void;
   onMoveToBacklog: () => void;
@@ -139,27 +145,17 @@ function SortableStop({ item, number, ...actions }: SortableStopProps) {
       style={{ transform: CSS.Translate.toString(transform), transition }}
     >
       <LegItem leg={item.legBefore} />
-      <div className={s.row}>
-        <div className={s.time}>{formatClock(item.arriveMin)}</div>
-        <StopCard
-          item={item}
-          number={number}
-          dragHandle={{ ref: setActivatorNodeRef, ...attributes, ...listeners }}
-          {...actions}
-        />
-      </div>
+      <StopCard item={item} number={number} dragHandle={{ ref: setActivatorNodeRef, ...attributes, ...listeners }} {...actions} />
     </li>
   );
 }
 
 function FixedRowItem({ row }: { row: FixedRow }) {
   return (
-    <li className={cx(s.row, s.rowCenter)}>
-      <div className={s.time}>{formatClock(row.atMin)}</div>
-      <div className={s.fixedRow}>
-        <span className={s.hBadge}>{row.kind === 'hotel' ? 'H' : <Icon name="plane" label="Flight" />}</span>
-        <span className={s.ellipsis}>{row.text}</span>
-      </div>
+    <li className={cx(s.softCard, s.fixedRow)}>
+      <span className={s.hBadge}>{row.kind === 'hotel' ? 'H' : <Icon name="plane" label="Flight" />}</span>
+      <span className={s.ellipsis}>{row.text}</span>
+      <span className={s.fixedTime}>{formatClock(row.atMin)}</span>
     </li>
   );
 }
@@ -211,12 +207,13 @@ type OpenTimeProps = PickerProps & { toMin: number; area: string };
 function OpenTimeBlock({ dayNumber, fromMin, toMin, near, area }: OpenTimeProps) {
   const [open, setOpen] = useState(false);
   return (
-    <div className={s.openTime}>
-      <div>
-        <span>
-          <span className={s.strong}>{formatDuration(toMin - fromMin)} free</span> until {formatClock(toMin)} near {area}
+    <div className={cx(s.softCard, s.openTime)}>
+      <span>
+        <span className={s.strong}>{formatDuration(toMin - fromMin)} free</span>{' '}
+        <span className={s.small}>
+          until {formatClock(toMin)}, near {area}
         </span>
-      </div>
+      </span>
       <Button onClick={() => setOpen((v) => !v)} aria-expanded={open}>
         {open ? 'Close' : 'Fill from backlog'}
       </Button>
@@ -228,7 +225,7 @@ function OpenTimeBlock({ dayNumber, fromMin, toMin, near, area }: OpenTimeProps)
 function EmptyDay({ dayNumber, near, fromMin }: PickerProps) {
   const [open, setOpen] = useState(false);
   return (
-    <li className={s.empty}>
+    <li className={cx(s.softCard, s.empty)}>
       <span className={s.emptyTitle}>No stops yet</span>
       <span className={s.small}>Add a place, or fill the day from your backlog.</span>
       <span className={s.actions}>

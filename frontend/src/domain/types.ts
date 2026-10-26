@@ -2,7 +2,7 @@
 // A close time past 1440 means the window runs into the next date.
 
 export type Objective = 'eat' | 'explore' | 'pictures' | 'experience';
-export type StopColor = 'orange' | 'slate' | 'moss' | 'ink';
+export type StopColor = 'green' | 'blue' | 'amber' | 'ink';
 export type TravelMode = 'walk' | 'transit';
 export type ExpenseCategory = 'flights' | 'stay' | 'food' | 'tickets' | 'transit';
 

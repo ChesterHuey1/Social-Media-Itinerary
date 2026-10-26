@@ -1,7 +1,7 @@
-/* Buttons are pills: filled for the one next step, white with a faint outline otherwise. */
+/* Buttons: one filled accent button for the next step, quiet white buttons for everything else. */
 .btn {
   height: 44px;
-  border-radius: 999px;
+  border-radius: var(--radius-control);
   font-size: 15px;
   font-weight: 600;
   display: inline-flex;
@@ -11,35 +11,32 @@
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
-  transition: background var(--ease), transform var(--ease);
-}
-.btn:active {
-  transform: translateY(1px);
+  transition: background var(--ease), box-shadow var(--ease);
 }
 .btn:disabled {
-  color: var(--muted);
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
 .primary {
   padding: 0 var(--s20);
   border: 0;
-  background: var(--orange);
-  color: var(--white);
+  background: var(--accent);
+  color: var(--surface);
 }
-.primary:hover {
-  background: var(--orange-hover);
+.primary:hover:not(:disabled) {
+  background: var(--accent-hover);
 }
 
 .secondary {
   padding: 0 var(--s16);
-  border: 1px solid var(--line);
-  background: var(--white);
+  border: 0;
+  background: var(--surface);
   color: var(--ink);
+  box-shadow: 0 1px 2px rgba(16, 40, 28, 0.08), inset 0 0 0 1px var(--line);
 }
 .secondary:hover:not(:disabled) {
-  border-color: var(--muted);
+  background: var(--page);
 }
 
 .text {
@@ -47,17 +44,18 @@
   border: 0;
   background: none;
   font-size: 14px;
-  color: var(--ink);
+  color: var(--accent-text);
 }
-.text:hover {
+.text:hover:not(:disabled) {
   text-decoration: underline;
 }
 .textAccent {
-  color: var(--orange-text);
+  color: var(--warn-text);
 }
 
 .tall {
   height: 52px;
+  padding: 0 var(--s24);
 }
 
 .label {
@@ -66,12 +64,12 @@
   color: var(--muted);
 }
 
-/* Tags are small soft rectangles, like Wanderlog's place categories. */
+/* Tags: small soft blocks. */
 .chip {
   height: 24px;
   padding: 0 var(--s8);
   border: 0;
-  border-radius: 6px;
+  border-radius: var(--radius-tag);
   font-size: 13px;
   font-weight: 600;
   display: inline-flex;
@@ -79,52 +77,53 @@
   white-space: nowrap;
 }
 .eat {
-  background: var(--orange-soft);
-  color: var(--orange-text);
+  background: var(--tag-eat-bg);
+  color: var(--tag-eat-text);
 }
 .explore {
-  background: var(--moss-tint);
-  color: var(--moss-text);
+  background: var(--tag-explore-bg);
+  color: var(--tag-explore-text);
 }
 .experience {
-  background: var(--slate-tint);
-  color: var(--slate);
+  background: var(--tag-experience-bg);
+  color: var(--tag-experience-text);
 }
 .pictures {
-  background: var(--neutral-tint);
+  background: var(--tag-pictures-bg);
   color: var(--ink);
 }
 .book {
-  background: var(--orange);
-  color: var(--white);
+  background: var(--warn-soft);
+  color: var(--warn-text);
 }
 .outline {
-  background: var(--neutral-tint);
+  background: var(--page);
   font-weight: 400;
-  color: var(--ink);
+  color: var(--muted);
 }
 .outlineSet {
+  color: var(--ink);
   font-weight: 600;
 }
 .chipButton {
   cursor: pointer;
-  transition: border-color var(--ease);
 }
 .chipButton:hover {
   background: var(--line);
 }
 .chipLarge {
-  height: 44px;
-  padding: 0 var(--s16);
-  border-radius: 999px;
+  height: 40px;
+  padding: 0 var(--s12);
+  border-radius: 10px;
+  font-size: 14px;
   cursor: pointer;
 }
 .toggleOff {
-  background: var(--white);
-  border: 1px solid var(--line);
+  background: var(--page);
   color: var(--muted);
 }
 
+/* Fields: filled, no outline until focused. */
 .field {
   display: flex;
   flex-direction: column;
@@ -139,22 +138,24 @@
   width: 100%;
   height: 48px;
   padding: 0 var(--s16);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: var(--white);
+  border: 0;
+  border-radius: var(--radius-control);
+  background: var(--page);
   color: var(--ink);
   font-size: 16px;
 }
 .input:focus {
   outline: none;
-  border-color: var(--orange);
-  box-shadow: 0 0 0 3px var(--orange-soft);
+  box-shadow: 0 0 0 2px var(--accent), 0 0 0 5px var(--focus-ring);
+}
+.input:disabled {
+  color: var(--muted);
 }
 .inputTime {
   height: 44px;
 }
 .inputDerived {
-  background: var(--stone);
+  background: var(--line-soft);
 }
 .textarea {
   height: auto;

@@ -1,6 +1,7 @@
 import { useTrip } from '../../state/tripContext';
 import { Button } from '../../ui/Button';
 import { ObjectiveChip } from '../../ui/Chip';
+import { cx } from '../../ui/cx';
 import s from './DayView.module.css';
 
 export function Backlog({ dayNumber }: { dayNumber: number }) {
@@ -16,33 +17,36 @@ export function Backlog({ dayNumber }: { dayNumber: number }) {
           {count} {count === 1 ? 'place' : 'places'}
         </span>
       </div>
-      {count === 0 && <p className={s.small}>Nothing here yet.</p>}
-      <ul className={s.backlogList}>
-        {trip.backlog.map((item) => {
-          const place = trip.places[item.placeId];
-          return (
-            <li key={item.placeId} className={s.backlogRow2}>
-              <div className={s.backlogText}>
-                <span>
-                  <span className={s.strong}>{place.name}</span> <span className={s.small}>{place.area}</span>
-                </span>
-                <span className={s.small}>{item.reason}</span>
-                <div className={s.chips}>
-                  {place.objectives.map((o) => (
-                    <ObjectiveChip key={o} objective={o} />
-                  ))}
+      {count === 0 ? (
+        <p className={s.small}>Nothing here yet.</p>
+      ) : (
+        <ul className={cx(s.card, s.backlogList)}>
+          {trip.backlog.map((item) => {
+            const place = trip.places[item.placeId];
+            return (
+              <li key={item.placeId} className={s.backlogItem}>
+                <div className={s.backlogText}>
+                  <span>
+                    <span className={s.strong}>{place.name}</span> <span className={s.small}>{place.area}</span>
+                  </span>
+                  <span className={s.small}>{item.reason}</span>
+                  <div className={s.chips}>
+                    {place.objectives.map((o) => (
+                      <ObjectiveChip key={o} objective={o} />
+                    ))}
+                  </div>
                 </div>
-              </div>
-              <Button
-                icon="plus"
-                onClick={() => edit({ type: 'addFromBacklog', dayNumber, placeId: place.id, stopId: crypto.randomUUID() })}
-              >
-                Day {dayNumber}
-              </Button>
-            </li>
-          );
-        })}
-      </ul>
+                <Button
+                  icon="plus"
+                  onClick={() => edit({ type: 'addFromBacklog', dayNumber, placeId: place.id, stopId: crypto.randomUUID() })}
+                >
+                  Day {dayNumber}
+                </Button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }
