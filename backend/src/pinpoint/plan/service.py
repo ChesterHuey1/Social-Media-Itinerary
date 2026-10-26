@@ -32,7 +32,7 @@ class OptimizeOutcome:
     dropped: list[Dropped]
 
 
-def _windows(place: models.Place) -> list[Window] | None:
+def opening_windows(place: models.Place) -> list[Window] | None:
     match place.hours.get("kind"):
         case "always":
             return None
@@ -85,7 +85,7 @@ def optimize_trip_day(session: Session, trip_id: str, day_number: int) -> Optimi
             known[key] = estimate(nodes[i], nodes[j])
         return known[key]
 
-    windows = {s.id: _windows(places[s.place_id]) for s in stops}
+    windows = {s.id: opening_windows(places[s.place_id]) for s in stops}
     inputs = [
         StopInput(s.id, s.stay_minutes, windows[s.id], places[s.place_id].last_entry_min, s.locked_at_min)
         for s in stops

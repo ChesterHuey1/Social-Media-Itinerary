@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from pinpoint import models, schemas
 from pinpoint.plan.build import DayToFill, PlaceToPlan, assign_days
 from pinpoint.plan.defaults import STOP_COLOR_CYCLE, default_stay_minutes
-from pinpoint.plan.service import Dropped, optimize_trip_day
+from pinpoint.plan.service import Dropped, opening_windows, optimize_trip_day
 from pinpoint.trips.read import stop_schema
 
 
@@ -49,7 +49,12 @@ def build_trip(session: Session, trip_id: str, included_place_ids: list[str]) ->
     days = list(trip.days)
     previous_days = [(d.number, [stop_schema(s) for s in d.stops]) for d in days]
     previous_backlog = [schemas.BacklogItem(place_id=b.place_id, reason=b.reason) for b in trip.backlog]
-    included = list(dict.fromkeys(included_place_ids))
+    # Stops already on the trip whose place isn't in the saved list (so had no checkbox) stay included.
+    saved_ids = set(
+        session.scalars(select(models.SavedPlace.place_id).where(models.SavedPlace.user_id == trip.user_id))
+    )
+    unlisted = [s.place_id for d in days for s in d.stops if s.place_id not in saved_ids]
+    included = list(dict.fromkeys([*included_place_ids, *unlisted]))
 
     # The saved list remembers which places this trip uses.
     for saved in session.scalars(select(models.SavedPlace).where(models.SavedPlace.user_id == trip.user_id)):
@@ -70,6 +75,7 @@ def build_trip(session: Session, trip_id: str, included_place_ids: list[str]) ->
             p.lat,
             p.lng,
             existing[p.id].stay_minutes if p.id in existing else default_stay_minutes(p.objectives),
+            None if (w := opening_windows(p)) is None else tuple((x.open_min, x.close_min) for x in w),
         )
         for pid in included
         if pid not in locked and (p := places.get(pid))
@@ -79,6 +85,8 @@ def build_trip(session: Session, trip_id: str, included_place_ids: list[str]) ->
             d.number,
             stays[d.stay_id].city,
             d.end_min - d.start_min - sum(s.stay_minutes for s in d.stops if s.locked_at_min is not None),
+            d.start_min,
+            d.end_min,
         )
         for d in days
     ]

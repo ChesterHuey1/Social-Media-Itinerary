@@ -11,6 +11,9 @@ export type BuildResult = {
   backlogged: { placeId: string; reason: string }[];
 };
 
+/** Passed to Day 1 after Build itinerary, for the toast and its Undo. */
+export type BuiltState = { placed: number; backlogged: number; previous: PlanSnapshot; at: number };
+
 export type OptimizeResult = {
   trip: Trip;
   /** The day before optimizing, for Undo. */

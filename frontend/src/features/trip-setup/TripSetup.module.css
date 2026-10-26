@@ -280,3 +280,9 @@
     display: none;
   }
 }
+
+.buildError {
+  flex-basis: 100%;
+  color: var(--warn-text);
+  font-size: 14px;
+}

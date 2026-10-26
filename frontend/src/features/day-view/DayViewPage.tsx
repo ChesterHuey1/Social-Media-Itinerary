@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { daySummary } from '../../domain/schedule';
 import { buildTimeline } from '../../domain/timeline';
 import { stayForDay } from '../../domain/trip';
+import type { BuiltState } from '../../state/api';
 import { useTrip } from '../../state/tripContext';
 import { cx } from '../../ui/cx';
 import { Icon } from '../../ui/Icon';
@@ -17,6 +18,8 @@ import { StopList } from './StopList';
 
 /** How long Undo stays available after Optimize route. */
 const UNDO_MS = 10_000;
+/** A build result older than this (for example after a page refresh) no longer offers Undo. */
+const BUILT_FRESH_MS = 60_000;
 
 type ViewTab = 'list' | 'map' | 'budget';
 const VIEW_TABS: { id: ViewTab; label: string }[] = [
@@ -28,8 +31,24 @@ const VIEW_TABS: { id: ViewTab; label: string }[] = [
 export function DayViewPage() {
   const { dayNumber } = useParams();
   const { trip, edit, optimize, saveError } = useTrip();
+  const location = useLocation();
+  const navigate = useNavigate();
   const [optimizing, setOptimizing] = useState(false);
-  const [toast, setToast] = useState<ToastState | null>(null);
+  // After Build itinerary, Trip setup sends the result here; it becomes the first toast, with Undo.
+  const [toast, setToast] = useState<ToastState | null>(() => {
+    const built = (location.state as { built?: BuiltState } | null)?.built;
+    if (!built || Date.now() - built.at > BUILT_FRESH_MS) return null;
+    const parts = [`Built your trip: ${built.placed} ${built.placed === 1 ? 'stop' : 'stops'} across ${trip.days.length} days.`];
+    if (built.backlogged > 0) parts.push(`${built.backlogged} in the backlog.`);
+    return {
+      message: parts.join(' '),
+      onUndo: () => {
+        edit({ type: 'restorePlan', days: built.previous.days, backlog: built.previous.backlog });
+        forgetBuilt();
+        setToast({ message: 'Back to your plan from before.', onUndo: null });
+      },
+    };
+  });
   const toastTimer = useRef<number | undefined>(undefined);
   const [editingStopId, setEditingStopId] = useState<string | null>(null);
   const [tab, setTab] = useState<ViewTab>('list');
@@ -44,7 +63,13 @@ export function DayViewPage() {
   const unmatchedPosts = trip.savedPosts.filter((p) => p.status === 'needs_review').length;
   const editingIndex = timeline.stops.findIndex((t) => t.stop.id === editingStopId);
 
+  // Drops the build result from history, so a refresh never offers a stale Undo.
+  function forgetBuilt() {
+    if ((location.state as { built?: BuiltState } | null)?.built) navigate(location.pathname, { replace: true, state: null });
+  }
+
   const showToast = (next: ToastState | null) => {
+    forgetBuilt();
     window.clearTimeout(toastTimer.current);
     setToast(next);
     if (next) toastTimer.current = window.setTimeout(() => setToast(null), UNDO_MS);

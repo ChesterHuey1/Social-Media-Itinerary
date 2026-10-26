@@ -6,14 +6,17 @@ import { Button } from '../../ui/Button';
 import { cx } from '../../ui/cx';
 import { TextField } from '../../ui/Field';
 import ui from '../../ui/ui.module.css';
+import type { BuiltState } from '../../state/api';
 import { useTrip } from '../../state/tripContext';
 import { BookingsSection } from './BookingsSection';
 import { SavedPlacesSection } from './SavedPlacesSection';
 import s from './TripSetup.module.css';
 
 export function TripSetupPage() {
-  const { trip } = useTrip();
+  const { trip, build } = useTrip();
   const navigate = useNavigate();
+  const [building, setBuilding] = useState(false);
+  const [buildFailed, setBuildFailed] = useState(false);
   const [included, setIncluded] = useState(
     () => new Set(trip.savedPlaces.filter((sp) => sp.included).map((sp) => sp.placeId)),
   );
@@ -25,6 +28,19 @@ export function TripSetupPage() {
       else next.add(placeId);
       return next;
     });
+
+  const buildTrip = async () => {
+    setBuilding(true);
+    setBuildFailed(false);
+    try {
+      const result = await build([...included]);
+      const built: BuiltState = { placed: result.placed, backlogged: result.backlogged.length, previous: result.previous, at: Date.now() };
+      navigate('/trip/day/1', { state: { built } });
+    } catch {
+      setBuildFailed(true);
+      setBuilding(false);
+    }
+  };
 
   return (
     <div className={s.page}>
@@ -46,8 +62,13 @@ export function TripSetupPage() {
           <span className={s.muted}>
             {included.size} places across {trip.days.length} days. Anything that doesn't fit goes to the backlog.
           </span>
-          <Button variant="primary" tall icon="arrowRight" onClick={() => navigate('/trip/day/1')}>
-            Build itinerary
+          {buildFailed && (
+            <span className={s.buildError} role="alert">
+              Couldn't build the itinerary. Check that the backend is running, then try again.
+            </span>
+          )}
+          <Button variant="primary" tall icon="arrowRight" onClick={buildTrip} disabled={building || included.size === 0}>
+            {building ? 'Building your trip…' : 'Build itinerary'}
           </Button>
         </footer>
       </main>

@@ -4,9 +4,11 @@ optimize.py.
 
 1. A place only goes on a day whose hotel is in the same city.
 2. Within a city, places are split by area with k-means, one group per day, so nearby places share a day.
-3. Bigger groups go to longer days. A group that needs more time than its day has gives its farthest
-   places to the nearest day with room left.
-(Opening days are not used yet: stored hours are the same every day of the week.)
+3. Bigger groups go to longer days.
+4. A place that can't be visited within its day's hours (Tsukiji closes at 2 PM; the arrival day starts at
+   1:50 PM) moves to the nearest day where it can. If no day works, it goes to the backlog with the reason.
+5. A day that needs more time than it has gives its farthest places to the nearest day with room.
+(Opening days of the week are not used yet: stored hours are the same every day.)
 
 This module is pure, so it is tested without a database.
 """
@@ -28,6 +30,8 @@ class PlaceToPlan:
     lat: float
     lng: float
     stay_min: int
+    # Opening windows as (open, close) minutes from midnight. None means open all day.
+    windows: tuple[tuple[int, int], ...] | None = None
 
 
 @dataclass(frozen=True)
@@ -35,6 +39,8 @@ class DayToFill:
     number: int
     city: str
     available_min: int
+    start_min: int = 0
+    end_min: int = 24 * 60
 
 
 @dataclass(frozen=True)
@@ -82,6 +88,26 @@ def _center(places: list[PlaceToPlan], mid_lat: float) -> tuple[float, float]:
     return (sum(x for x, _ in xy) / len(xy), sum(y for _, y in xy) / len(xy))
 
 
+def can_visit(place: PlaceToPlan, day: DayToFill) -> bool:
+    """True when the place is open long enough for its stay at some point within the day's hours."""
+    if place.windows is None:
+        return True
+    return any(
+        max(open_min, day.start_min) <= min(close_min, day.end_min) - place.stay_min
+        for open_min, close_min in place.windows
+    )
+
+
+def _nearest_day(
+    place: PlaceToPlan, options: list[DayToFill], planned: dict[int, list[PlaceToPlan]], mid_lat: float
+) -> DayToFill:
+    """The option whose planned places are centered closest to `place`; an empty day counts as right here."""
+    here = _xy(place, mid_lat)
+    return min(
+        options, key=lambda d: _distance(here, _center(planned[d.number], mid_lat) if planned[d.number] else here)
+    )
+
+
 def _cost(places: list[PlaceToPlan]) -> int:
     return sum(p.stay_min + TRAVEL_ALLOWANCE_MIN for p in places)
 
@@ -111,6 +137,17 @@ def assign_days(places: list[PlaceToPlan], days: list[DayToFill]) -> Assignment:
         planned = {d.number: list(g) for d, g in zip(by_length, groups, strict=False)}
         budget = {d.number: d.available_min * DAY_FILL for d in city_days}
 
+        # Places that can't be visited within their day's hours move to the nearest day where they can.
+        for day in by_length:
+            for place in [p for p in planned[day.number] if not can_visit(p, day)]:
+                planned[day.number].remove(place)
+                options = [d for d in city_days if can_visit(place, d)]
+                if not options:
+                    unplaced[place.id] = f"Not open during your day hours in {city}."
+                    continue
+                roomy = [d for d in options if _cost(planned[d.number]) + _cost([place]) <= budget[d.number]]
+                planned[_nearest_day(place, roomy or options, planned, mid_lat).number].append(place)
+
         # Overfull days give their farthest places to the nearest day with room.
         for day in by_length:
             group = planned[day.number]
@@ -121,17 +158,12 @@ def assign_days(places: list[PlaceToPlan], days: list[DayToFill]) -> Assignment:
                 roomy = [
                     d
                     for d in city_days
-                    if d.number != day.number and _cost(planned[d.number]) + _cost([far]) <= budget[d.number]
+                    if d.number != day.number
+                    and can_visit(far, d)
+                    and _cost(planned[d.number]) + _cost([far]) <= budget[d.number]
                 ]
                 if roomy:
-                    nearest = min(
-                        roomy,
-                        key=lambda d: _distance(
-                            _xy(far, mid_lat),
-                            _center(planned[d.number], mid_lat) if planned[d.number] else _xy(far, mid_lat),
-                        ),
-                    )
-                    planned[nearest.number].append(far)
+                    planned[_nearest_day(far, roomy, planned, mid_lat).number].append(far)
                 else:
                     # No day has room: keep it here and let the day's solver decide; it may move it to the backlog.
                     group.append(far)

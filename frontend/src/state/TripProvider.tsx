@@ -2,7 +2,7 @@ import { use, useRef, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { applyTripEdit, type TripEdit } from '../domain/tripEdits';
 import type { Trip } from '../domain/types';
-import { fetchTrip, optimizeDay, saveEdit, TRIP_ID, type OptimizeResult } from './api';
+import { buildItinerary, fetchTrip, optimizeDay, saveEdit, TRIP_ID, type BuildResult, type OptimizeResult } from './api';
 import { TripContext } from './tripContext';
 
 // Started once, outside render, and read with use() so loading needs no effect.
@@ -18,7 +18,7 @@ function showWithTransition(update: () => void) {
  * Each edit shows on screen at once, then saves to the server in order.
  * When the last save in flight comes back, the screen takes the server's copy.
  * If a save fails, the screen reloads the stored trip and says so.
- * Optimize route waits its turn behind pending saves, then shows the server's new order.
+ * Optimize route and Build itinerary wait their turn behind pending saves, then show the server's result.
  */
 export function TripProvider({ children }: { children: ReactNode }) {
   const [trip, setTrip] = useState<Trip>(use(initialTrip));
@@ -57,5 +57,18 @@ export function TripProvider({ children }: { children: ReactNode }) {
       });
     });
 
-  return <TripContext value={{ trip, edit, optimize, saveError }}>{children}</TripContext>;
+  const build = (includedPlaceIds: string[]) =>
+    new Promise<BuildResult>((resolve, reject) => {
+      queue.current = queue.current.then(async () => {
+        try {
+          const result = await buildItinerary(TRIP_ID, includedPlaceIds);
+          setTrip(result.trip);
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        }
+      });
+    });
+
+  return <TripContext value={{ trip, edit, optimize, build, saveError }}>{children}</TripContext>;
 }
